@@ -1,0 +1,54 @@
+# --- macOS ---
+.DS_Store
+
+# --- Python backend ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.so
+*.egg-info/
+.dist-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.coverage*
+htmlcov/
+build/
+dist/
+
+# virtual envs
+venv/
+.venv/
+env/
+ENV/
+
+# local configs / secrets
+*.env
+*.env.*
+!.env.example
+
+# --- Editors/IDEs ---
+.vscode/
+.idea/
+
+# --- Node/Frontend ---
+node_modules/
+.bun/
+.pnpm-store/
+.turbo/
+.parcel-cache/
+.cache/
+coverage/
+.next/
+out/
+dist/
+build/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# lockfiles (usually keep one; uncomment to ignore all)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
