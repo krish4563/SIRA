@@ -10,6 +10,35 @@
     "title": "Introduction to Machine Learning",
     "url": "https://example.com/ml-intro",
     "text": "Machine learning enables computers to learn from data without explicit programming. It is the foundation of AI applications."
+  },
+  {
+    "topic": "artificial intelligence",
+    "title": "Artificial intelligence",
+    "url": "https://en.wikipedia.org/wiki/Artificial_intelligence",
+    "text": "Artificial intelligence (AI) is the capability of computational systems to perform tasks typically associated with human intelligence"
+  },
+  {
+    "topic": "artificial intelligence",
+    "title": "What Is Artificial Intelligence (AI)?",
+    "url": "https://www.ibm.com/think/topics/artificial-intelligence",
+    "text": "Artificial intelligence (AI) is technology that enables computers and machines to simulate human learning, comprehension, problem solving, decision-making, ..."
+  },
+  {
+    "topic": "artificial intelligence",
+    "title": "What is Artificial Intelligence?",
+    "url": "https://www.nasa.gov/what-is-artificial-intelligence/",
+    "text": "Artificial intelligence refers to computer systems that can perform complex tasks normally done by human-reasoning, decision making, ..."
+  },
+  {
+    "topic": "artificial intelligence",
+    "title": "What is Artificial Intelligence (AI)?",
+    "url": "https://cloud.google.com/learn/what-is-artificial-intelligence",
+    "text": "Artificial intelligence (AI) is a set of technologies that empowers computers to learn, reason, and perform a variety of advanced tasks in ways that used to ..."
+  },
+  {
+    "topic": "artificial intelligence",
+    "title": "Artificial Intelligence (AI)",
+    "url": "https://library.educause.edu/topics/infrastructure-and-research-technologies/artificial-intelligence-ai",
+    "text": "Artificial Intelligence or AI refers to the simulated human intelligence in machines or computers that are programmed to undertake tasks usually thought to ..."
   }
 ]
-
