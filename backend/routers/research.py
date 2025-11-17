@@ -6,7 +6,9 @@ from services.memory_manager import MemoryManager
 
 # Unified multi-provider retriever
 from services.multi_retriever import search_and_extract
-from services.summarizer import summarize_text
+
+# Updated imports
+from services.summarizer import summarize_article
 
 router = APIRouter()
 mm = MemoryManager()
@@ -17,7 +19,7 @@ async def run_research(topic: str = Query(...), user_id: str = Query("demo")):
     """
     Full Research Pipeline:
     1. Search topic
-    2. Summarize content
+    2. Summarize content using new summarizer
     3. Evaluate credibility
     4. Store in vector memory
     5. Generate Knowledge Graph
@@ -35,11 +37,11 @@ async def run_research(topic: str = Query(...), user_id: str = Query("demo")):
             print(f"[WARN] Skipping article without text: {art.get('title')}")
             continue
 
-        # Summarization
-        summary = summarize_text(text_to_summarize)
+        # 🔄 NEW Summarization function
+        summary = summarize_article(text_to_summarize)
 
-        # Credibility evaluation (use same text, not art["summary"] to avoid KeyError)
-        credibility = evaluate_source(art.get("url", ""), text_to_summarize)
+        # Credibility evaluation
+        credibility = evaluate_source(art.get("url", ""), summary)
 
         # Store in memory (vector DB or Pinecone)
         await mm.upsert_text(
@@ -56,7 +58,7 @@ async def run_research(topic: str = Query(...), user_id: str = Query("demo")):
         )
         summaries.append(summary)
 
-    # ✅ Build Knowledge Graph from all summaries
+    # Generate Knowledge Graph
     kg = []
     if summaries:
         try:

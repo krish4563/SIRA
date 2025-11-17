@@ -11,3 +11,4 @@ transformers==4.45.1
 torch>=2.0
 spacy==3.7.2
 requests
+openai>=1.50.0
