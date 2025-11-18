@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Query
 
 from services.critic import evaluate_source
-from services.knowledge_graph import extract_triplets_from_texts
+from services.knowledge_graph import extract_knowledge_graph
 from services.memory_manager import MemoryManager
 
 # Unified multi-provider retriever
@@ -58,14 +58,17 @@ async def run_research(topic: str = Query(...), user_id: str = Query("demo")):
         )
         summaries.append(summary)
 
-    # Generate Knowledge Graph
-    kg = []
-    if summaries:
+    # -------------------------------
+    # ✅ NEW KNOWLEDGE GRAPH LOGIC
+    # -------------------------------
+    kg = {}
+    if processed:
         try:
-            kg = extract_triplets_from_texts(summaries)
+            full_text_blob = "\n\n".join([r["summary"] for r in processed])
+            kg = await extract_knowledge_graph(full_text_blob)
         except Exception as e:
             print(f"[ERROR] Knowledge Graph extraction failed: {e}")
-            kg = []
+            kg = {}
 
     return {
         "topic": topic,
