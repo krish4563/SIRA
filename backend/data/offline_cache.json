@@ -100,5 +100,185 @@
     "title": "GM Electric Vehicles, Charging & Technology",
     "url": "https://www.gm.com/innovation/electric-vehicles",
     "text": "GM offers a growing lineup of electric vehicles across segments. From the Chevrolet Equinox EV to the GMC HUMMER EV, and All-Electric Cadillac LYRIQ."
+  },
+  {
+    "topic": "electric vehicles disadvantages",
+    "title": "What Are the Disadvantages of EVs? - U.S. News Cars",
+    "url": "https://cars.usnews.com/cars-trucks/advice/what-are-the-disadvantages-of-evs",
+    "text": "The Downsides of EV Ownership · Limited Driving Range · Electric Cars With the Longest Range · Limited Infrastructure · A Guide to U.S. EV ..."
+  },
+  {
+    "topic": "electric vehicles disadvantages",
+    "title": "7 Disadvantages of Electric Cars",
+    "url": "https://www.carwow.co.uk/guides/choosing/disadvantages-of-electric-cars",
+    "text": "What are the disadvantages of electric cars? · 1. Limited battery range · 2. Battery lifespan concerns · 3. Charging infrastructure worries · 4."
+  },
+  {
+    "topic": "electric vehicles disadvantages",
+    "title": "The Downside of Electric Cars",
+    "url": "https://www.greencars.com/expert-insights/the-downside-of-electric-cars",
+    "text": "EV battery packs are made with materials that are expensive, and in some cases, toxic and flammable. Primary materials include lithium, nickel, cobalt, and ..."
+  },
+  {
+    "topic": "electric vehicles disadvantages",
+    "title": "Electric Vehicle Myths | US EPA",
+    "url": "https://www.epa.gov/greenvehicles/electric-vehicle-myths",
+    "text": "Electric vehicles (EVs) typically have a smaller carbon footprint than gasoline cars, even when accounting for the electricity used for charging."
+  },
+  {
+    "topic": "electric vehicles disadvantages",
+    "title": "Electric Cars - What are the downsides to electric cars?",
+    "url": "https://betterplaneteducation.org.uk/factsheets/electric-cars-what-are-the-downsides-to-electric-cars",
+    "text": "Their batteries need rare metals · Making electric cars creates more emissions · They are only as green as their power sources · Electric cars can be expensive to ..."
+  },
+  {
+    "topic": "electric vehicles advantages",
+    "title": "Electric Vehicle Benefits and Considerations",
+    "url": "https://afdc.energy.gov/fuels/electricity-benefits",
+    "text": "All forms of electric vehicles (EVs) can help improve fuel economy, lower fuel costs, and reduce emissions. Using electricity as a power source for ..."
+  },
+  {
+    "topic": "electric vehicles advantages",
+    "title": "Why the Electric Vehicle Revolution Can Benefit Everyone",
+    "url": "https://www.nrdc.org/stories/why-electric-vehicle-revolution-can-benefit-everyone",
+    "text": "Why the Electric Vehicle Revolution Can Benefit Everyone · Cleaner air and better health · EVs Explained · New jobs and economic growth · Lower ..."
+  },
+  {
+    "topic": "electric vehicles advantages",
+    "title": "I made a list of EV advantages. What else can you add, ...",
+    "url": "https://www.reddit.com/r/electricvehicles/comments/1hu996j/i_made_a_list_of_ev_advantages_what_else_can_you/",
+    "text": "They also offer an arguably calmer experience for passengers since acceleration can be smoother and vibrations and noise is significantly lower."
+  },
+  {
+    "topic": "electric vehicles advantages",
+    "title": "Top 5 Reasons to Drive Electric",
+    "url": "https://driveclean.ca.gov/top-reasons",
+    "text": "#1 – Get Money for a Purchase/Lease · #2 – Save on Fuel Costs · #3 – Save on Maintenance Costs · #4 – Have More Fun with Higher Performance · #5 – Clean Up Planet ..."
+  },
+  {
+    "topic": "electric vehicles advantages",
+    "title": "Benefits to Communities | US Department of Transportation",
+    "url": "https://www.transportation.gov/rural/ev/toolkit/ev-benefits-and-challenges/community-benefits",
+    "text": "Compared to conventional vehicles, EVs have significantly lower GHG emissions, especially if electricity is generated with renewable energy ..."
+  },
+  {
+    "topic": "kubernetes autoscaling of pods",
+    "title": "Horizontal Pod Autoscaling",
+    "url": "https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/",
+    "text": "A HorizontalPodAutoscaler automatically updates a workload resource (such as a Deployment or StatefulSet), with the aim of automatically scaling the workload ..."
+  },
+  {
+    "topic": "kubernetes autoscaling of pods",
+    "title": "Autoscaling Workloads",
+    "url": "https://kubernetes.io/docs/concepts/workloads/autoscaling/",
+    "text": "With autoscaling, you can automatically update your workloads in one way or another. This allows your cluster to react to changes in ..."
+  },
+  {
+    "topic": "kubernetes autoscaling of pods",
+    "title": "The Power of Kubernetes Auto-Scaling",
+    "url": "https://medium.com/@extio/the-power-of-kubernetes-auto-scaling-scaling-your-applications-with-ease-cb232391400c",
+    "text": "Kubernetes auto-scaling refers to the ability of the platform to automatically adjust the number of running instances, known as pods, based on ..."
+  },
+  {
+    "topic": "kubernetes autoscaling of pods",
+    "title": "Kubernetes Autoscaling: 3 Methods and How to Make ...",
+    "url": "https://spot.io/resources/kubernetes-autoscaling/3-methods-and-how-to-make-them-great/",
+    "text": "Kubernetes autoscaling allows a cluster to automatically increase or decrease the number of nodes, or adjust pod resources, in response to demand."
+  },
+  {
+    "topic": "kubernetes autoscaling of pods",
+    "title": "Chapter 3: Cluster Autoscaling - Kubernetes Guides",
+    "url": "https://www.apptio.com/topics/kubernetes/autoscaling/cluster/",
+    "text": "The Cluster Autoscaler automatically adds or removes nodes in a cluster based on resource requests from pods. The Cluster Autoscaler doesn't directly measure ..."
+  },
+  {
+    "topic": "kubernetes demand in 2025",
+    "title": "36 Kubernetes Statistics You Must Know in 2025",
+    "url": "https://www.tigera.io/learn/guides/kubernetes-security/kubernetes-statistics/",
+    "text": "Reasons for Kubernetes Adoption · 65% run Kubernetes in multiple environments for portability · 48% use it to abstract infrastructure and accelerate modernization ..."
+  },
+  {
+    "topic": "kubernetes demand in 2025",
+    "title": "For someone starting now, is Kubernetes still a smart skill ...",
+    "url": "https://www.reddit.com/r/kubernetes/comments/1nm28v2/for_someone_starting_now_is_kubernetes_still_a/",
+    "text": "Kubernetes is popular with large companies. At this point, it's relatively complex, and may be overkill. Longer term, it's getting abstracted ..."
+  },
+  {
+    "topic": "kubernetes demand in 2025",
+    "title": "Is Kubernetes still a big no-no for early stages in 2025?",
+    "url": "https://news.ycombinator.com/item?id=44976292",
+    "text": "There aren't really any huge gotchas imho in 2025, just watch out that you don't get sidetracked delivering awesome developer infrastructure ( ..."
+  },
+  {
+    "topic": "kubernetes demand in 2025",
+    "title": "Kubernetes in the Wild report 2025",
+    "url": "https://www.dynatrace.com/resources/ebooks/kubernetes-in-the-wild/",
+    "text": "The 2025 edition of the Kubernetes in the Wild report highlights global trends in the technology's adoption and usage in production environments."
+  },
+  {
+    "topic": "kubernetes demand in 2025",
+    "title": "The state of Kubernetes jobs in 2025 Q1",
+    "url": "https://kube.careers/state-of-kubernetes-jobs-2025-q1",
+    "text": "For the first quarter of 2025, the average minimum salary for North American Kubernetes jobs is $138,723, while the maximum average is $191,853, bringing the ..."
+  },
+  {
+    "topic": "trump goverment agenda 2025",
+    "title": "2025 Donald J. Trump Executive Orders",
+    "url": "https://www.federalregister.gov/presidential-documents/executive-orders/donald-trump/2025",
+    "text": "In 2025, Donald J. Trump signed 212 Executive orders (from EO 14147 through EO 14358). This page contains documents that have been published in the Federal ..."
+  },
+  {
+    "topic": "trump goverment agenda 2025",
+    "title": "Project 2025, Explained | American Civil Liberties ...",
+    "url": "https://www.aclu.org/project-2025-explained",
+    "text": "Project 2025 is a federal policy agenda and blueprint for a radical restructuring of the executive branch authored and published by former Trump administration ..."
+  },
+  {
+    "topic": "trump goverment agenda 2025",
+    "title": "The Trump-Vance Administration Priorities",
+    "url": "https://www.whitehouse.gov/issues/",
+    "text": "The President will usher a Golden Age for America by reforming and improving the government bureaucracy to work for the American people."
+  },
+  {
+    "topic": "trump goverment agenda 2025",
+    "title": "Project 2025",
+    "url": "https://en.wikipedia.org/wiki/Project_2025",
+    "text": "... Agenda 47 is the only official plan for a second Trump presidency. Policy suggestions from groups in Project 2025 reflected Trump's own words."
+  },
+  {
+    "topic": "trump goverment agenda 2025",
+    "title": "Trump's 2025 Executive Orders",
+    "url": "https://www.hklaw.com/en/general-pages/trumps-2025-executive-orders-chart",
+    "text": "This executive order lists federal agencies and subdivisions that are determined to be vital to intelligence, counterintelligence, investigative or national ..."
+  },
+  {
+    "topic": "nifty50 today short or call",
+    "title": "Nifty 50",
+    "url": "https://www.moneycontrol.com/indian-indices/nifty-50-9.html",
+    "text": "First Tick: Top global cues to watch in today's trade. Nov 18, 2025 07:09 AM ... call on 02268882347. moneycontrol. Follow Us On: Facebook · twitter ..."
+  },
+  {
+    "topic": "nifty50 today short or call",
+    "title": "Nifty 50 Index Today (NSEI)",
+    "url": "https://www.investing.com/indices/s-p-cnx-nifty",
+    "text": "The Nifty 50 live stock price is 26,013.45. What Is the Nifty 50 Ticker Symbol? NSEI is the ticker symbol of the Nifty 50 index. Is Nifty 50 a Good Stock Market ..."
+  },
+  {
+    "topic": "nifty50 today short or call",
+    "title": "Nifty 50 Index Today — Chart and News",
+    "url": "https://www.tradingview.com/symbols/NSE-NIFTY/",
+    "text": "The current value of Nifty 50 Index is 26,013.45 INR — it has risen by 0.40% in the past 24 hours. Track the index more closely on the Nifty 50 Index chart."
+  },
+  {
+    "topic": "nifty50 today short or call",
+    "title": "NIFTY 50",
+    "url": "https://www.nseindia.com/index-tracker/NIFTY%2050",
+    "text": "Most Active Contracts As on 17-NOV-2025 15:30:19 IST ; Most Active Calls · NIFTY 18NOV25 26000 CE, 76.05 ; Most Active Puts · NIFTY 18NOV25 26000 PE, 57.60 ; Most ..."
+  },
+  {
+    "topic": "nifty50 today short or call",
+    "title": "Nifty 50 Live | NSE Nifty 50 Index Today - S&P CNX Nifty",
+    "url": "https://economictimes.indiatimes.com/markets/indices/nifty-50",
+    "text": "The previous day's closing value of Nifty 50 was 25910.05. As of today, the current value of Nifty 50 stands at 26013.45. What are the returns generated by ..."
   }
 ]
