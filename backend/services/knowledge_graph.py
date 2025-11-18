@@ -1,33 +1,163 @@
+import json
 import re
 from dataclasses import dataclass
-from typing import List, Dict, Tuple, Set
+from typing import Dict, List, Set, Tuple
 
-# Lazy spaCy load (so app boots even if model missing)
-_nlp = None
+from services.llm_client import run_chat_completion
+
+# ====================================================
+# ===================  GPT KG PROMPT  =================
+# ====================================================
+
+KG_PROMPT = """
+You are an expert Knowledge Graph extractor.
+
+Your task:
+1. Extract **entities** with labels and types.
+2. Extract **relationships** between entities (subject → relation → object).
+3. Output strictly **valid JSON only**, following the required schema.
+
+ENTITY TYPES allowed:
+PERSON, ORG, PRODUCT, TECH, FRAMEWORK, COUNTRY, EVENT,
+TOOL, CONCEPT, SKILL, METRIC, POLICY, DATASET, UNKNOWN
+
+RELATION RULES:
+- Keep relation labels short, 1–4 words max.
+- No long sentences.
+- No duplicate relations.
+
+STRICT OUTPUT SCHEMA:
+{
+  "nodes": [
+    { "id": "kubernetes", "label": "Kubernetes", "type": "TECH" }
+  ],
+  "edges": [
+    { "source": "kubernetes", "target": "cloud-native", "label": "enables" }
+  ]
+}
+
+Rules:
+- IDs must be lowercase, hyphen-separated.
+- JSON only — no explanations, no markdown.
+- If unsure, classify entity type as "UNKNOWN".
+
+Now extract the knowledge graph from this text:
+
+TEXT:
+-----
+{TEXT}
+-----
+"""
 
 
-def _get_nlp():
-    global _nlp
-    if _nlp is None:
+# ====================================================
+# =========  GPT-BASED KNOWLEDGE GRAPH EXTRACTOR  =====
+# ====================================================
+
+
+async def extract_knowledge_graph(text: str) -> Dict:
+    """
+    Build an advanced knowledge graph using GPT-4.1-mini with strict JSON output.
+    """
+    if not text or not text.strip():
+        return {"nodes": [], "edges": [], "counts": {"nodes": 0, "edges": 0}}
+
+    prompt = KG_PROMPT.replace("{TEXT}", text[:15000])  # safe limit
+
+    completion = await run_chat_completion(prompt, json_mode=True)
+
+    if not completion:
+        return empty_graph()
+
+    # Try strict JSON load
+    try:
+        kg = json.loads(completion)
+        return finalize_graph(kg)
+    except Exception:
+        # Try auto-repair
         try:
-            import spacy
-
-            _nlp = spacy.load("en_core_web_sm")
-        except Exception as e:
-            # As a fallback, try to load via package name if linked differently
-            import spacy
-
-            try:
-                _nlp = spacy.load("en_core_web_sm")
-            except Exception:
-                raise RuntimeError(
-                    "spaCy model 'en_core_web_sm' not found. "
-                    "Run: python -m spacy download en_core_web_sm"
-                )
-    return _nlp
+            cleaned = completion.strip().split("```json")[-1].split("```")[0].strip()
+            kg = json.loads(cleaned)
+            return finalize_graph(kg)
+        except Exception:
+            return empty_graph()
 
 
-# Entity labels we’ll keep
+def empty_graph():
+    return {"nodes": [], "edges": [], "counts": {"nodes": 0, "edges": 0}}
+
+
+def normalize_id(text: str) -> str:
+    return text.lower().replace(" ", "-").replace(":", "").strip()
+
+
+def finalize_graph(kg: Dict) -> Dict:
+    """
+    Validate & deduplicate nodes/edges.
+    Convert into Cytoscape-format structure (with .data wrapper).
+    """
+    if not isinstance(kg, dict):
+        return empty_graph()
+
+    raw_nodes = kg.get("nodes", [])
+    raw_edges = kg.get("edges", [])
+
+    node_map = {}
+    edge_set = set()
+    final_nodes = []
+    final_edges = []
+
+    # ---- NODES ----
+    for n in raw_nodes:
+        if not isinstance(n, dict):
+            continue
+
+        nid = normalize_id(n.get("id", ""))
+        label = n.get("label") or n.get("id") or ""
+        etype = n.get("type", "UNKNOWN")
+
+        if not nid:
+            continue
+
+        if nid not in node_map:
+            node_map[nid] = {"data": {"id": nid, "label": label, "type": etype}}
+
+    final_nodes = list(node_map.values())
+
+    # ---- EDGES ----
+    for e in raw_edges:
+        if not isinstance(e, dict):
+            continue
+
+        src = normalize_id(e.get("source", ""))
+        tgt = normalize_id(e.get("target", ""))
+        rel = e.get("label", "").strip()
+
+        if not (src and tgt and rel):
+            continue
+
+        edge_key = (src, tgt, rel)
+        if edge_key not in edge_set:
+            edge_set.add(edge_key)
+            final_edges.append({"data": {"source": src, "target": tgt, "label": rel}})
+
+    return {
+        "nodes": final_nodes,
+        "edges": final_edges,
+        "counts": {
+            "nodes": len(final_nodes),
+            "edges": len(final_edges),
+        },
+    }
+
+
+# ====================================================
+# ==========  SPACY-BASED TRIPLET EXTRACTOR  =========
+# ====================================================
+
+import spacy
+
+# Allowed spaCy entity labels
 ENTITY_LABELS = {
     "PERSON",
     "ORG",
@@ -41,11 +171,21 @@ ENTITY_LABELS = {
 }
 
 
+def _get_nlp():
+    try:
+        return spacy.load("en_core_web_sm")
+    except Exception:
+        raise RuntimeError(
+            "spaCy model 'en_core_web_sm' not found. Install it using:\n"
+            "python -m spacy download en_core_web_sm"
+        )
+
+
 @dataclass(frozen=True)
 class Node:
-    id: str  # normalized text
-    label: str  # original text
-    type: str  # spaCy label
+    id: str
+    label: str
+    type: str
 
 
 @dataclass(frozen=True)
@@ -70,18 +210,14 @@ def _extract_entities(doc) -> List[Node]:
 
 
 def _relation_from_span(span_text: str) -> str:
-    """Very light relation guess from connecting text."""
-    # prioritize short verbs/preps/nouns as relation labels
     text = span_text.strip().lower()
     text = re.sub(r"[^a-z0-9\s\-_/]", "", text)
     text = re.sub(r"\s+", " ", text)
-    # common fillers -> reduce
     text = re.sub(
         r"\b(the|a|an|of|and|to|in|for|with|on|as|by|from)\b", "", text
     ).strip()
     if not text:
         return "related_to"
-    # truncate to keep relations short
     return text[:40]
 
 
@@ -91,8 +227,9 @@ def _extract_sentence_edges(doc) -> List[Edge]:
         ents = [e for e in sent.ents if e.label_ in ENTITY_LABELS]
         if len(ents) < 2:
             continue
-        # pairwise within sentence; relation is the text between them
+
         ents_sorted = sorted(ents, key=lambda e: e.start_char)
+
         for i in range(len(ents_sorted) - 1):
             a, b = ents_sorted[i], ents_sorted[i + 1]
             between = sent.text[
@@ -101,13 +238,14 @@ def _extract_sentence_edges(doc) -> List[Edge]:
             rel = _relation_from_span(between)
             src = _normalize(a.text)
             tgt = _normalize(b.text)
+
             if src != tgt:
                 edges.append(Edge(source=src, target=tgt, relation=rel))
+
     return edges
 
 
 def _cooccurrence_edges(nodes: List[Node]) -> List[Edge]:
-    """Fallback: simple co-occurrence edges (undirected as two directed)."""
     out: List[Edge] = []
     for i in range(len(nodes)):
         for j in range(i + 1, len(nodes)):
@@ -140,15 +278,16 @@ def extract_triplets_from_texts(texts: List[str]) -> Dict:
     for t in texts:
         if not t or not t.strip():
             continue
+
         doc = nlp(t)
         nodes = _extract_entities(doc)
+
         for n in nodes:
             if n.id not in node_map:
                 node_map[n.id] = n
 
         edges = _extract_sentence_edges(doc)
         if not edges and len(nodes) >= 2:
-            # fallback to co-occurrence if no explicit relation discovered
             edges = _cooccurrence_edges(nodes)
 
         all_edges.extend(edges)
@@ -156,7 +295,6 @@ def extract_triplets_from_texts(texts: List[str]) -> Dict:
     final_nodes = list(node_map.values())
     final_edges = dedup_edges(all_edges)
 
-    # Cytoscape-friendly structure
     return {
         "nodes": [
             {"data": {"id": n.id, "label": n.label, "type": n.type}}
