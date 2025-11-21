@@ -310,5 +310,53 @@
     "title": "What Are Kubernetes Jobs and How to Use Them, with ...",
     "url": "https://spot.io/resources/kubernetes-architecture/what-are-kubernetes-jobs-and-how-to-use-them-with-examples/",
     "text": "Kubernetes Jobs are a resource within Kubernetes that helps schedule and automatically carry out batch tasks—short-term, one-off tasks that need to be run to ..."
+  },
+  {
+    "topic": "kubernetes scaling",
+    "title": "Guide to Kubernetes Scaling: Horizontal, Vertical & Cluster",
+    "url": "https://spacelift.io/blog/kubernetes-scaling",
+    "text": "Kubernetes scaling refers to the process of dynamically adjusting the number of pod replicas (instances of your application) in a Kubernetes ..."
+  },
+  {
+    "topic": "ai in healthcare",
+    "title": "Artificial intelligence in healthcare: transforming the ...",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8285156/",
+    "text": "AI is a powerful and disruptive area of computer science, with the potential to fundamentally transform the practice of medicine and the delivery of healthcare."
+  },
+  {
+    "topic": "ai in healthcare",
+    "title": "Artificial Intelligence (AI) in Healthcare & Medical Field",
+    "url": "https://www.foreseemed.com/artificial-intelligence-in-healthcare",
+    "text": "The benefits of AI in healthcare include faster, more accurate diagnoses, improved treatment recommendations, and data-driven decision-making. This capability ..."
+  },
+  {
+    "topic": "ai in healthcare",
+    "title": "7 ways AI is transforming healthcare",
+    "url": "https://www.weforum.org/stories/2025/08/ai-transforming-global-health/",
+    "text": "AI technologies are already helping doctors spot fractures, triage patients and detect early signs of disease. Yet healthcare is \"below average\" ..."
+  },
+  {
+    "topic": "ai in healthcare",
+    "title": "AI in Healthcare | MScAC | University of Toronto",
+    "url": "https://mscac.utoronto.ca/concentrations/aih/",
+    "text": "The AI and Healthcare concentration aims to provide a training background for students who desire to enter the field as either medical experts or computer ..."
+  },
+  {
+    "topic": "ai in education",
+    "title": "Artificial intelligence in education",
+    "url": "https://www.unesco.org/en/digital-education/artificial-intelligence",
+    "text": "AI has the potential to address some of the biggest challenges in education today, innovate teaching and learning practices, and accelerate progress towards ..."
+  },
+  {
+    "topic": "ai in education",
+    "title": "AI in Schools: Pros and Cons - College of Education | Illinois",
+    "url": "https://education.illinois.edu/about/news-events/news/article/2024/10/24/ai-in-schools--pros-and-cons",
+    "text": "AI can be used to inspire and foster creativity, lend multiple perspectives, summarize existing materials, generate and reinforce lesson plans, and stimulate ..."
+  },
+  {
+    "topic": "ai in education",
+    "title": "Artificial Intelligence and the Future of Teaching and ...",
+    "url": "https://www.ed.gov/sites/ed/files/documents/ai-report/ai-report.pdf",
+    "text": "Rising Interest in AI in Education ... Toward Policies for AI in Education ..."
   }
 ]
