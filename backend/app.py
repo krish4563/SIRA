@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 # --- Existing Routers ---
 from routers import health, memory, research
+from routers.conversations import router as conversations_router
 from routers.history import router as history_router
 from routers.scheduler import router as scheduler_router
 
@@ -31,6 +32,7 @@ app.include_router(research.router, prefix="/api/pipeline")
 app.include_router(memory.router, prefix="/api/memory")
 app.include_router(scheduler_router, prefix="/api/schedule")
 app.include_router(history_router, prefix="/api/schedule")
+app.include_router(conversations_router, prefix="/api/conversations")
 
 
 # -------------------------
