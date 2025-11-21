@@ -1,10 +1,10 @@
 # services/llm_client.py
 
 import logging
-
-from openai import APIConnectionError, OpenAI, OpenAIError, RateLimitError
+from typing import Dict
 
 from config import settings
+from openai import APIConnectionError, OpenAI, OpenAIError, RateLimitError
 
 logger = logging.getLogger(__name__)
 
@@ -148,3 +148,93 @@ async def run_chat_completion(prompt: str, json_mode: bool = False) -> str:
         logger.error("[LLM ERROR - run_chat_completion] Unexpected: %r", e)
 
     return ""
+
+
+def diff_research_runs(latest: Dict, previous: Dict) -> str:
+    """
+    Use GPT-4.1-mini to explain the difference between two auto-research runs.
+    Both dicts are rows from `auto_research_history`.
+
+    Returns a short, structured natural-language diff.
+    """
+    # Safe extraction with fallbacks
+    topic = latest.get("topic") or previous.get("topic") or "Unknown topic"
+
+    # Ensure we always have strings
+    latest_summary = (latest.get("full_summary_text") or "").strip()
+    previous_summary = (previous.get("full_summary_text") or "").strip()
+
+    # Hard length cap to avoid huge prompt
+    max_chars = 4000
+    latest_summary = latest_summary[:max_chars]
+    previous_summary = previous_summary[:max_chars]
+
+    meta_latest = {
+        "status": latest.get("status"),
+        "result_count": latest.get("result_count"),
+        "kg_nodes": latest.get("kg_nodes"),
+        "kg_edges": latest.get("kg_edges"),
+        "run_finished_at": latest.get("run_finished_at"),
+    }
+    meta_previous = {
+        "status": previous.get("status"),
+        "result_count": previous.get("result_count"),
+        "kg_nodes": previous.get("kg_nodes"),
+        "kg_edges": previous.get("kg_edges"),
+        "run_finished_at": previous.get("run_finished_at"),
+    }
+
+    meta_block = (
+        f"TOPIC: {topic}\n\n"
+        f"PREVIOUS RUN META:\n{meta_previous}\n\n"
+        f"LATEST RUN META:\n{meta_latest}\n"
+    )
+
+    prompt = f"""
+You are an assistant that compares two research runs on the same topic.
+
+You are given:
+- High-level metadata for the previous and latest runs
+- Aggregated summaries of what each run found
+
+Your job:
+1. Explain in 5–8 bullet points what CHANGED between the previous and latest run.
+2. Focus on:
+   - New insights or sources that appear in the latest run
+   - Insights that disappeared or became less prominent
+   - Changes in knowledge graph complexity (nodes/edges)
+   - Any change in reliability or confidence (if visible)
+3. Keep it neutral, factual, and concise.
+4. If there is very little difference, explicitly say that the runs are largely similar.
+
+{meta_block}
+
+----- PREVIOUS RUN SUMMARY -----
+{previous_summary or "(no summary text)"}
+
+----- LATEST RUN SUMMARY -----
+{latest_summary or "(no summary text)"}
+"""
+
+    try:
+        resp = client.chat.completions.create(
+            model=MODEL,
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a precise, neutral research comparison assistant.",
+                },
+                {
+                    "role": "user",
+                    "content": prompt,
+                },
+            ],
+            max_tokens=350,
+        )
+        return resp.choices[0].message.content.strip()
+    except Exception as e:
+        # On any error, fall back to a minimal string so the API still works
+        logging.getLogger(__name__).error("[LLM DIFF] Error generating diff: %s", e)
+        return (
+            "Unable to generate semantic diff for these runs due to an internal error."
+        )
