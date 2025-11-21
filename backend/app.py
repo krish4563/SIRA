@@ -1,20 +1,19 @@
+from config import settings
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from config import settings
-
 # --- Existing Routers ---
 from routers import health, memory, research
+from routers.history import router as history_router
 from routers.scheduler import router as scheduler_router
 
-# --- NEW (Scheduler) ---
-from services.scheduler import restore_jobs_from_disk, start_scheduler
+# --- Scheduler Services ---
+from services.scheduler import cancel_job, restore_jobs_from_db, start_scheduler
 
 app = FastAPI(title="SIRA Backend", version=settings.api_version)
 
-
 # -------------------------
-# CORS (unchanged)
+# CORS
 # -------------------------
 app.add_middleware(
     CORSMiddleware,
@@ -24,33 +23,37 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 # -------------------------
-# Existing Routers (unchanged)
+# Routers
 # -------------------------
 app.include_router(health.router, prefix="/health")
 app.include_router(research.router, prefix="/api/pipeline")
 app.include_router(memory.router, prefix="/api/memory")
-
-# --- NEW AUTO RESEARCH ROUTER ---
 app.include_router(scheduler_router, prefix="/api/schedule")
+app.include_router(history_router, prefix="/api/schedule")
 
 
 # -------------------------
-# Startup event (NEW)
+# Startup event
 # -------------------------
 @app.on_event("startup")
 def startup_event():
-    # start the scheduler
     start_scheduler()
-
-    # restore tasks from last session
-    restore_jobs_from_disk()
+    restore_jobs_from_db()
 
 
 # -------------------------
-# Root (unchanged)
+# Root
 # -------------------------
 @app.get("/")
 def root():
     return {"service": "SIRA", "version": settings.api_version}
+
+
+# -------------------------
+# CANCEL JOB ENDPOINT  (FIXED)
+# -------------------------
+@app.post("/api/schedule/cancel")
+def cancel_job_route(job_id: str):
+    ok = cancel_job(job_id)
+    return {"status": "cancelled", "job_id": job_id, "success": ok}
