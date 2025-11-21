@@ -1,7 +1,7 @@
 # services/conversations.py
 
 from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from services.supabase_client import get_supabase
 
@@ -11,7 +11,7 @@ from services.supabase_client import get_supabase
 # ─────────────────────────────────────
 def create_conversation(user_id: str, topic_title: str) -> str:
     supabase = get_supabase()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(timezone.utc).isoformat()
 
     resp = (
         supabase.table("conversations")
@@ -19,8 +19,8 @@ def create_conversation(user_id: str, topic_title: str) -> str:
             {
                 "user_id": user_id,
                 "topic_title": topic_title,
-                "created_at": now.isoformat(),
-                "updated_at": now.isoformat(),
+                "created_at": now,
+                "updated_at": now,
             }
         )
         .execute()
@@ -33,12 +33,18 @@ def create_conversation(user_id: str, topic_title: str) -> str:
 
 
 # ─────────────────────────────────────
-# ADD MESSAGE TO A CONVERSATION
+# ADD MESSAGE (with meta + auto-update updated_at)
 # ─────────────────────────────────────
-def add_message(conversation_id: str, role: str, content: str) -> str:
+def add_message(
+    conversation_id: str,
+    role: str,
+    content: str,
+    meta: Optional[dict] = None,
+) -> str:
     supabase = get_supabase()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(timezone.utc).isoformat()
 
+    # Insert message
     resp = (
         supabase.table("messages")
         .insert(
@@ -46,7 +52,8 @@ def add_message(conversation_id: str, role: str, content: str) -> str:
                 "conversation_id": conversation_id,
                 "role": role,
                 "content": content,
-                "timestamp": now.isoformat(),
+                "timestamp": now,
+                "meta": meta or {},
             }
         )
         .execute()
@@ -55,15 +62,25 @@ def add_message(conversation_id: str, role: str, content: str) -> str:
     if not resp.data:
         raise RuntimeError("Failed to insert message.")
 
+    # Auto-update updated_at in conversations table
+    supabase.table("conversations").update({"updated_at": now}).eq(
+        "id", conversation_id
+    ).execute()
+
     return resp.data[0]["id"]
 
 
 # ─────────────────────────────────────
-# GET FULL CONVERSATION
+# GET FULL CONVERSATION (with pagination)
 # ─────────────────────────────────────
-def get_conversation(conversation_id: str) -> Dict[str, Any]:
+def get_conversation(
+    conversation_id: str,
+    limit: int = 50,
+    offset: int = 0,
+) -> Dict[str, Any]:
     supabase = get_supabase()
 
+    # Fetch conversation meta
     conv_resp = (
         supabase.table("conversations")
         .select("*")
@@ -75,17 +92,23 @@ def get_conversation(conversation_id: str) -> Dict[str, Any]:
     if not conv_resp.data:
         return {}
 
+    # Fetch paginated messages
     msg_resp = (
         supabase.table("messages")
         .select("*")
         .eq("conversation_id", conversation_id)
         .order("timestamp", desc=False)
+        .range(offset, offset + limit - 1)
         .execute()
     )
 
     return {
         "conversation": conv_resp.data,
         "messages": msg_resp.data or [],
+        "pagination": {
+            "limit": limit,
+            "offset": offset,
+        },
     }
 
 
@@ -110,7 +133,7 @@ def list_conversations_grouped(user_id: str) -> Dict[str, List[Dict[str, Any]]]:
     yesterday_start = today_start - timedelta(days=1)
     week_start = today_start - timedelta(days=7)
 
-    grouped = {
+    grouped: Dict[str, List[Dict[str, Any]]] = {
         "Today": [],
         "Yesterday": [],
         "Previous 7 Days": [],
@@ -118,11 +141,9 @@ def list_conversations_grouped(user_id: str) -> Dict[str, List[Dict[str, Any]]]:
     }
 
     for row in rows:
-        created_at = row.get("created_at")
-        if isinstance(created_at, str):
-            created_at_dt = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
-        else:
-            created_at_dt = created_at
+        created_at = row["created_at"]
+        # Normalize ISO strings
+        created_dt = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
 
         item = {
             "id": row["id"],
@@ -130,13 +151,14 @@ def list_conversations_grouped(user_id: str) -> Dict[str, List[Dict[str, Any]]]:
             "created_at": created_at,
         }
 
-        if created_at_dt >= today_start:
+        if created_dt >= today_start:
             grouped["Today"].append(item)
-        elif yesterday_start <= created_at_dt < today_start:
+        elif yesterday_start <= created_dt < today_start:
             grouped["Yesterday"].append(item)
-        elif week_start <= created_at_dt < yesterday_start:
+        elif week_start <= created_dt < yesterday_start:
             grouped["Previous 7 Days"].append(item)
         else:
             grouped["Older"].append(item)
 
+    # Remove empty groups (ChatGPT-style)
     return {k: v for k, v in grouped.items() if v}
