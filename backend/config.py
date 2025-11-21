@@ -24,6 +24,10 @@ class Settings:
     openai_api_key: str = os.getenv("OPENAI_API_KEY", "")
     summarizer_model: str = os.getenv("SUMMARIZER_MODEL", "gpt-4.1-mini")
 
+    # Supabase (Backend Only)
+    supabase_url: str = os.getenv("SUPABASE_URL", "")
+    supabase_service_role_key: str = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
+
     # App meta
     api_version: str = "0.1.0"
 
