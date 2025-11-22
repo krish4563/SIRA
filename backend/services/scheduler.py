@@ -5,6 +5,12 @@ from typing import Dict
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
+
+# NEW IMPORTS FOR EMAIL NOTIFICATIONS
+from services.email_service import (
+    send_scheduler_cancelled_email,
+    send_scheduler_started_email,
+)
 from services.supabase_client import get_supabase
 from services.tasks import run_research_task
 
@@ -42,7 +48,7 @@ def restore_jobs_from_db() -> Dict[str, dict]:
         user_id = row["user_id"]
         interval = row["interval_seconds"]
 
-        # NOTE: we also pass job_id to the task now
+        # Register job with APScheduler
         scheduler.add_job(
             run_research_task,
             trigger=IntervalTrigger(seconds=interval),
@@ -50,11 +56,13 @@ def restore_jobs_from_db() -> Dict[str, dict]:
             args=[topic, user_id, job_id],
             replace_existing=True,
         )
+
         out[job_id] = {
             "topic": topic,
             "user_id": user_id,
             "interval": interval,
         }
+
         logger.info("[SCHEDULER] Restored job '%s' (%s)", job_id, topic)
 
     return out
@@ -84,15 +92,12 @@ def schedule_new_job(topic: str, user_id: str, interval_seconds: int) -> str:
     """
     sb = get_supabase()
 
-    # 1) Upsert in DB: if an active job for same user+topic already exists,
-    #    we deactivate it (soft delete) and create a fresh one.
-    #    (This keeps history clean while ensuring only one active job.)
-    # Deactivate old active jobs for same user+topic
+    # Soft delete old active jobs for same user + topic
     sb.table("auto_research_jobs").update({"is_active": False}).match(
         {"user_id": user_id, "topic": topic, "is_active": True}
     ).execute()
 
-    # Insert new job
+    # Insert new job into DB
     resp = (
         sb.table("auto_research_jobs")
         .insert(
@@ -109,7 +114,7 @@ def schedule_new_job(topic: str, user_id: str, interval_seconds: int) -> str:
     row = (resp.data or [])[0]
     job_id = row["id"]
 
-    # 2) Register with APScheduler
+    # Register with APScheduler
     scheduler.add_job(
         run_research_task,
         trigger=IntervalTrigger(seconds=interval_seconds),
@@ -125,6 +130,21 @@ def schedule_new_job(topic: str, user_id: str, interval_seconds: int) -> str:
         topic,
         interval_seconds,
     )
+
+    # --------------------------------------------
+    # SEND EMAIL: Scheduler Started
+    # --------------------------------------------
+    try:
+        # TODO: Replace with real user email when users table exists
+        user_email = "indrranil7@gmail.com"
+        send_scheduler_started_email(
+            user_email,
+            topic,
+            interval_seconds,
+        )
+    except Exception as e:
+        logger.warning("[EMAIL] Failed to send job-started email: %s", e)
+
     return job_id
 
 
@@ -134,28 +154,53 @@ def cancel_job(job_id: str) -> bool:
     """
     sb = get_supabase()
 
-    # 1) Soft delete in DB
+    # Fetch the job topic for email notification
+    topic_resp = (
+        sb.table("auto_research_jobs")
+        .select("topic")
+        .eq("id", job_id)
+        .single()
+        .execute()
+    )
+
+    topic = None
+    if topic_resp and topic_resp.data:
+        topic = topic_resp.data.get("topic")
+
+    # Soft delete job in DB
     sb.table("auto_research_jobs").update({"is_active": False}).eq(
         "id", job_id
     ).execute()
 
-    # 2) Remove from in-memory scheduler
+    # Remove from in-memory scheduler
     try:
         scheduler.remove_job(job_id)
         logger.info("[SCHEDULER] Removed job %s", job_id)
     except Exception as e:
-        # It's okay if the job wasn't scheduled (e.g., never started)
         logger.warning("[SCHEDULER] remove_job failed for %s: %s", job_id, e)
+
+    # --------------------------------------------
+    # SEND EMAIL: Scheduler Cancelled
+    # --------------------------------------------
+    try:
+        if topic:
+            user_email = "indrranil7@gmail.com"
+            send_scheduler_cancelled_email(
+                user_email=user_email,
+                topic=topic,
+            )
+    except Exception as e:
+        logger.warning("[EMAIL] Failed to send cancellation email: %s", e)
 
     return True
 
 
 def list_jobs() -> Dict[str, dict]:
     """
-    Return a mapping {job_id: {topic, user_id, interval}} of active jobs.
-    This matches your previous JSON-based API shape.
+    Return mapping {job_id: {topic, user_id, interval}} of active jobs.
     """
     sb = get_supabase()
+
     resp = (
         sb.table("auto_research_jobs")
         .select("id, user_id, topic, interval_seconds, is_active")
@@ -165,6 +210,7 @@ def list_jobs() -> Dict[str, dict]:
 
     rows = resp.data or []
     out: Dict[str, dict] = {}
+
     for row in rows:
         job_id = row["id"]
         out[job_id] = {
@@ -172,4 +218,5 @@ def list_jobs() -> Dict[str, dict]:
             "user_id": row["user_id"],
             "interval": row["interval_seconds"],
         }
+
     return out
