@@ -2,16 +2,17 @@ from config import settings
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# --- Existing Routers ---
+# --- Routers ---
 from routers import health, memory, research
 from routers.conversations import router as conversations_router
 from routers.history import router as history_router
 from routers.scheduler import router as scheduler_router
 
 # --- Scheduler Services ---
-from services.scheduler import cancel_job, restore_jobs_from_db, start_scheduler
+from services.scheduler import cancel_job, start_scheduler
 
 app = FastAPI(title="SIRA Backend", version=settings.api_version)
+
 
 # -------------------------
 # CORS
@@ -23,6 +24,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # -------------------------
 # Routers
@@ -40,8 +42,12 @@ app.include_router(conversations_router, prefix="/api/conversations")
 # -------------------------
 @app.on_event("startup")
 def startup_event():
+    """
+    Start APScheduler and automatically restore jobs from DB.
+    NOTE: start_scheduler() internally restores DB jobs,
+    so DO NOT call restore_jobs_from_db() again.
+    """
     start_scheduler()
-    restore_jobs_from_db()
 
 
 # -------------------------
