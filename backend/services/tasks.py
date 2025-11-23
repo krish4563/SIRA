@@ -339,7 +339,7 @@ def run_research_task(topic: str, user_id: str, job_id: Optional[str] = None):
         # 5. EMAIL NOTIFICATIONS
         # ----------------------------------------------------
         try:
-            user_email = "indrranil7@gmail.com"
+            user_email = "krishsaraiya999@gmail.com"
             human_time = _format_human_time(end_ts)
 
             # FAILURE email
