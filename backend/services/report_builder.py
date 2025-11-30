@@ -3,7 +3,7 @@
 import logging
 from io import BytesIO
 from typing import Dict, List, Optional, Tuple
-
+from services.conversations import get_conversation
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
@@ -390,6 +390,83 @@ def build_job_report(job_id: str) -> bytes:
         x=25 * mm,
         y=y,
     )
+
+    # Finalize
+    c.showPage()
+    c.save()
+    buf.seek(0)
+    return buf.getvalue()
+def build_conversation_report(conversation_id: str) -> bytes:
+    """
+    Build a timeline-style PDF report for a given conversation_id.
+    Uses the conversations + messages stored in Supabase.
+    """
+    data = get_conversation(conversation_id, limit=1000, offset=0)
+    if not data or not data.get("conversation"):
+        raise ValueError("Conversation not found.")
+
+    conv = data["conversation"]
+    messages = data.get("messages") or []
+
+    topic = conv.get("topic_title") or "Untitled Conversation"
+    user_id = conv.get("user_id", "unknown")
+    created_at = _safe_time_str(conv.get("created_at"))
+    total_messages = len(messages)
+
+    buf = BytesIO()
+    c = canvas.Canvas(buf, pagesize=A4)
+    width, height = A4
+
+    # ---------------
+    # PAGE 1 — Cover
+    # ---------------
+    _draw_header(c, "SIRA Conversation Report", subtitle="Research Timeline")
+
+    y = height - 30 * mm
+    y = _draw_section_title(c, "Conversation Overview", y)
+
+    y = _draw_label_value(c, "Topic", topic, 25 * mm, y)
+    y = _draw_label_value(c, "User ID", str(user_id), 25 * mm, y)
+    y = _draw_label_value(c, "Conversation ID", conversation_id, 25 * mm, y)
+    y = _draw_label_value(c, "Created At", created_at, 25 * mm, y)
+    y = _draw_label_value(c, "Total Messages", str(total_messages), 25 * mm, y)
+
+    c.showPage()
+
+    # -------------------------
+    # PAGE 2+ — Message Timeline
+    # -------------------------
+    _draw_header(c, "Message Timeline", subtitle=topic)
+    y = height - 30 * mm
+    y = _draw_section_title(c, "Messages", y)
+    y -= 4 * mm
+
+    for msg in messages:
+        ts = _safe_time_str(msg.get("timestamp"))
+        role = msg.get("role", "unknown").capitalize()
+        content = msg.get("content", "")
+
+        # Timestamp + role line
+        c.setFont("Helvetica-Bold", 10)
+        c.setFillColor(colors.black)
+        c.drawString(25 * mm, y, f"[{ts}] {role}")
+        y -= 5 * mm
+
+        # Content wrapped
+        y = _wrap_text(
+            c,
+            content or "(empty message)",
+            max_width=width - 40 * mm,
+            x=30 * mm,
+            y=y,
+        )
+        y -= 3 * mm
+
+        # New page if needed
+        if y < 30 * mm:
+            c.showPage()
+            _draw_header(c, "Message Timeline (cont.)", subtitle=topic)
+            y = height - 30 * mm
 
     # Finalize
     c.showPage()

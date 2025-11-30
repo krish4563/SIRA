@@ -580,5 +580,125 @@
     "title": "The State of AI: Global Survey 2025",
     "url": "https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai",
     "text": "In this 2025 edition of the annual McKinsey Global Survey on AI, we look at the current trends that are driving real value from artificial ..."
+  },
+  {
+    "topic": "i want to know about current football rankings",
+    "title": "2025 College Football Rankings",
+    "url": "https://www.espn.com/college-football/rankings",
+    "text": "College Football Rankings ; 1. Ohio State OSU Ohio State (61). 11-0 ; 2. Indiana IU Indiana. 11-0 ; 3. Texas A&M TA&M Texas A&M (2). 11-0 ; 4. Georgia UGA Georgia."
+  },
+  {
+    "topic": "i want to know about current football rankings",
+    "title": "College football rankings: Associated Press Top 25",
+    "url": "https://www.ncaa.com/rankings/football/fbs/associated-press",
+    "text": "Get NCAA college football rankings ... 19, Washington 16, Iowa 10, UNLV 7, South Florida 4, UConn 3, Wake Forest 2, Illinois 1. LATEST COLLEGE FOOTBALL NEWS."
+  },
+  {
+    "topic": "i want to know about current football rankings",
+    "title": "2025 NFL Division Standings",
+    "url": "https://www.nfl.com/standings/",
+    "text": "Standings ; AFC EAST · New England Patriots. Patriots ; AFC NORTH · Pittsburgh Steelers. Steelers ; AFC SOUTH · Indianapolis Colts. Colts ; AFC WEST · Denver Broncos."
+  },
+  {
+    "topic": "i want to know about current football rankings",
+    "title": "College Football Rankings 2025-26",
+    "url": "https://www.cbssports.com/college-football/rankings/cbs-sports-rankings/",
+    "text": "Get the latest College Football rankings for the 2025-26 season. Find out where your favorite team is ranked in the AP Top 25, Coaches Poll, CBS Sports ..."
+  },
+  {
+    "topic": "i would like to know about self initated research agent",
+    "title": "Self-Initiated Open World Learning for Autonomous AI Agents",
+    "url": "https://arxiv.org/html/2110.11385v3",
+    "text": "This paper proposes the SOL framework to promote the research of autonomous learning agents so that they can face the real open world and learn by themselves."
+  },
+  {
+    "topic": "i would like to know about self initated research agent",
+    "title": "Welcome to the era of self-replicating Ai agents. A few ...",
+    "url": "https://www.reddit.com/r/aipromptprogramming/comments/1ius5uu/welcome_to_the_era_of_selfreplicating_ai_agents_a/",
+    "text": "How can I use your product to create a local instance (agent?) which can learn from online sources, other models, and adapt to user requirements ..."
+  },
+  {
+    "topic": "i would like to know about self initated research agent",
+    "title": "The Research Agent: Addressing the Challenge of ...",
+    "url": "https://medium.com/data-science/the-research-agent-4ef8e6f1b741",
+    "text": "I made an Autonomous AI Research Agent that can answer difficult questions with deep multi-hop reasoning capabilities."
+  },
+  {
+    "topic": "i want to know about total ev cars sales in india approx",
+    "title": "India's Electric Car Sales Zoom Past the 1,00000 Mark in ...",
+    "url": "https://evreporter.com/indias-electric-car-sales-zoom-past-the-100000-mark-in-the-current-fy-2025-26/",
+    "text": "India's Electric Car Sales Zoom Past the 1,00,000 Mark in the Current FY 2025-26. A total of 119,332 electric cars were registered in India in ..."
+  },
+  {
+    "topic": "i want to know about total ev cars sales in india approx",
+    "title": "Electric Vehicle Industry in India: Growth, Trends & Policy",
+    "url": "https://www.ibef.org/industry/electric-vehicle",
+    "text": "* Sales of electric vehicles (EVs) in India's luxury segment rose by 66% YoY to 2,027 units during the first five months of 2025, up from 1,223 units in the ..."
+  },
+  {
+    "topic": "i want to know about total ev cars sales in india approx",
+    "title": "Trends in electric car markets – Global EV Outlook 2025",
+    "url": "https://www.iea.org/reports/global-ev-outlook-2025/trends-in-electric-car-markets-2",
+    "text": "However, in India, total electric car sales and their share of sales increased only slightly, approaching 100 000 (or 2%) in 2024."
+  },
+  {
+    "topic": "i want to know about total ev cars sales in india approx",
+    "title": "At 5%, EV share in car sales nearly doubles in year",
+    "url": "https://timesofindia.indiatimes.com/business/india-business/at-5-ev-share-in-car-sales-nearly-doubles-in-yr/articleshow/124797006.cms",
+    "text": "EVs now represent around 5% of total passenger vehicle sales, up from 2.6%. Major players like JSW MG Motor and Tata Motors are leading this ..."
+  },
+  {
+    "topic": "i want to know about fuel price prediction using ml",
+    "title": "Fuel Price Optimization using Machine Learning",
+    "url": "https://pditechnologies.com/resources/article/fuel-price-optimization-using-machine-learning/",
+    "text": "Understand the fundamentals of fuel price optimization using machine learning to make significant predictions about sales, revenue, ..."
+  },
+  {
+    "topic": "i want to know about fuel price prediction using ml",
+    "title": "Using Machine Learning to Predict Retail Gasoline Prices",
+    "url": "https://medium.com/@jakescb/using-machine-learning-to-predict-retail-gasoline-prices-dc6eedc6d120",
+    "text": "I want to take advantage of the LSTM network, so I am going to pass in the prior 12 days of data to predict the current retail gas prices."
+  },
+  {
+    "topic": "i want to know about fuel price prediction using ml",
+    "title": "FIRE-Phoebe/Gas_Price_analysis: Forecasting the gas ...",
+    "url": "https://github.com/FIRE-Phoebe/Gas_Price_analysis",
+    "text": "Our Gas Price Analysis uses Python, Web Scraping, and Machine Learning to explore the past Gas Prices in the US and forecast future gas prices."
+  },
+  {
+    "topic": "i want to know about fuel price prediction using ml",
+    "title": "petrol price prediction _with ARIMA, AutoML, LSTM",
+    "url": "https://www.kaggle.com/code/raihan150146/petrol-price-prediction-with-arima-automl-lstm",
+    "text": "The objective is to forecast crude oil prices for the next 16 months, commencing on January 1, 2019, and extending through April 2020."
+  },
+  {
+    "topic": "let's take random forest for this give me dataset resources on kaggle and some research paper details on it",
+    "title": "Random Forests",
+    "url": "https://www.kaggle.com/code/dansbecker/random-forests",
+    "text": "We'll look at the random forest as an example. The random forest uses many trees, and it makes a prediction by averaging the predictions of each component tree."
+  },
+  {
+    "topic": "let's take random forest for this give me dataset resources on kaggle and some research paper details on it",
+    "title": "Random Forest Classifier Tutorial",
+    "url": "https://www.kaggle.com/code/prashant111/random-forest-classifier-tutorial",
+    "text": "Random Forest is a supervised machine learning algorithm which is based on ensemble learning. In this kernel, I build two Random Forest Classifier models to ..."
+  },
+  {
+    "topic": "let's take random forest for this give me dataset resources on kaggle and some research paper details on it",
+    "title": "Datasets - Random Forest",
+    "url": "https://www.kaggle.com/datasets?tags=13402-Random+Forest",
+    "text": "Download Open Datasets on 1000s of Projects + Share Projects on One Platform. Explore Popular Topics Like Government, Sports, Medicine, Fintech, Food, More."
+  },
+  {
+    "topic": "let's take random forest for this give me dataset resources on kaggle and some research paper details on it",
+    "title": "Random Forest Model (Clearly Explained!!)",
+    "url": "https://www.kaggle.com/code/odaymourad/random-forest-model-clearly-explained",
+    "text": "In this post, we will examine how basic decision trees work, how individual decisions trees are combined to make a random forest, and ultimately discover why ..."
+  },
+  {
+    "topic": "let's take random forest for this give me dataset resources on kaggle and some research paper details on it",
+    "title": "How random forests really work",
+    "url": "https://www.kaggle.com/code/jhoward/how-random-forests-really-work",
+    "text": "In this notebook, we're going to learn all about Random Forests, by building one from scratch, and using it to submit to the Titanic competition!"
   }
 ]
