@@ -1,3 +1,4 @@
+# backend/services/knowledge_graph.py
 import json
 import re
 from dataclasses import dataclass
@@ -107,8 +108,8 @@ def finalize_graph(kg: Dict) -> Dict:
     final_nodes = []
     final_edges = []
 
-    # ---- NODES ----
-    for n in raw_nodes:
+    # ---- NODES ---- (limit to 50 for performance)
+    for n in raw_nodes[:100]:  # ✅ Limit input
         if not isinstance(n, dict):
             continue
 
@@ -121,11 +122,15 @@ def finalize_graph(kg: Dict) -> Dict:
 
         if nid not in node_map:
             node_map[nid] = {"data": {"id": nid, "label": label, "type": etype}}
+            
+        # ✅ Stop if we have enough nodes
+        if len(node_map) >= 50:
+            break
 
     final_nodes = list(node_map.values())
 
-    # ---- EDGES ----
-    for e in raw_edges:
+    # ---- EDGES ---- (limit to 100)
+    for e in raw_edges[:200]:  # ✅ Limit input
         if not isinstance(e, dict):
             continue
 
@@ -135,11 +140,19 @@ def finalize_graph(kg: Dict) -> Dict:
 
         if not (src and tgt and rel):
             continue
+        
+        # Only add edges between existing nodes
+        if src not in node_map or tgt not in node_map:
+            continue
 
         edge_key = (src, tgt, rel)
         if edge_key not in edge_set:
             edge_set.add(edge_key)
             final_edges.append({"data": {"source": src, "target": tgt, "label": rel}})
+        
+        # ✅ Stop if we have enough edges
+        if len(final_edges) >= 100:
+            break
 
     return {
         "nodes": final_nodes,

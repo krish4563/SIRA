@@ -2,13 +2,14 @@
 
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, BackgroundTasks
 from pydantic import BaseModel
 from services.conversations import (
     add_message,
     create_conversation,
     get_conversation,
     list_conversations_grouped,
+    generate_and_update_title
 )
 from services.supabase_client import get_supabase
 
@@ -51,11 +52,13 @@ def start_conversation(payload: StartConversationRequest):
 
 
 @router.post("/{conversation_id}/message")
-def post_message(conversation_id: str, payload: MessageRequest):
+def post_message(
+    conversation_id: str, 
+    payload: MessageRequest, 
+    background_tasks: BackgroundTasks # <--- Inject BackgroundTasks
+):
     """
-    Add a message to a conversation.
-    Supports: role, content, meta (citations / KG / etc).
-    Auto-updates conversation.updated_at.
+    Add a message. If it's the first user message, auto-generate the title.
     """
     if payload.role not in ("user", "agent"):
         raise HTTPException(status_code=400, detail="Role must be 'user' or 'agent'")
@@ -66,6 +69,38 @@ def post_message(conversation_id: str, payload: MessageRequest):
         content=payload.content,
         meta=payload.meta,
     )
+
+    # ---------------------------------------------------------
+    # AUTO-TITLE CHECK
+    # ---------------------------------------------------------
+    if payload.role == "user":
+        # Check current state of conversation
+        data = get_conversation(conversation_id, limit=5)
+        conversation = data.get("conversation", {})
+        messages = data.get("messages", [])
+        
+        current_title = conversation.get("topic_title", "")
+        
+        # Count how many messages the user has sent
+        user_message_count = sum(1 for m in messages if m.get("role") == "user")
+
+        print(f"\n[DEBUG] Title Logic Check:")
+        print(f" - Current Title: '{current_title}'")
+        print(f" - User Msg Count: {user_message_count}")
+
+        # LOGIC: Rename if title is generic OR if this is the very first user message
+        is_generic_title = current_title.strip().lower() in ["new chat", "untitled", "new research"]
+        is_first_message = user_message_count <= 1
+
+        if is_generic_title or is_first_message:
+            print("🚀 TRIGGERING Auto-Title Background Task!")
+            background_tasks.add_task(
+                generate_and_update_title, 
+                conversation_id, 
+                payload.content
+            )
+        else:
+            print("🛑 SKIPPING Auto-Title (Title is set and conversation is ongoing)")
 
     return {"message_id": msg_id}
 
@@ -98,7 +133,6 @@ def conversation_details(
 def delete_conversation(conversation_id: str):
     """
     Delete a conversation.
-    Messages auto-delete due to foreign key cascade.
     """
     supabase = get_supabase()
 

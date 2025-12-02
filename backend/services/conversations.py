@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional
 
 from services.supabase_client import get_supabase
-
+from services.llm_client import generate_chat_title
 
 # ─────────────────────────────────────
 # CREATE CONVERSATION
@@ -120,9 +120,11 @@ def list_conversations_grouped(user_id: str) -> Dict[str, List[Dict[str, Any]]]:
 
     resp = (
         supabase.table("conversations")
-        .select("id, topic_title, created_at")
+        # ✅ Fetch updated_at so we can sort properly
+        .select("id, topic_title, created_at, updated_at")
         .eq("user_id", user_id)
-        .order("created_at", desc=True)
+        # ✅ Order by Last Active (updated_at) not Created
+        .order("updated_at", desc=True) 
         .execute()
     )
 
@@ -142,23 +144,43 @@ def list_conversations_grouped(user_id: str) -> Dict[str, List[Dict[str, Any]]]:
 
     for row in rows:
         created_at = row["created_at"]
+        updated_at = row.get("updated_at") or created_at
+        
+        # ✅ Use updated_at for grouping logic
         # Normalize ISO strings
-        created_dt = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
+        sort_dt = datetime.fromisoformat(updated_at.replace("Z", "+00:00"))
 
         item = {
             "id": row["id"],
             "title": row["topic_title"],
             "created_at": created_at,
+            "updated_at": updated_at, # ✅ Send to frontend
         }
 
-        if created_dt >= today_start:
+        if sort_dt >= today_start:
             grouped["Today"].append(item)
-        elif yesterday_start <= created_dt < today_start:
+        elif yesterday_start <= sort_dt < today_start:
             grouped["Yesterday"].append(item)
-        elif week_start <= created_dt < yesterday_start:
+        elif week_start <= sort_dt < yesterday_start:
             grouped["Previous 7 Days"].append(item)
         else:
             grouped["Older"].append(item)
 
     # Remove empty groups (ChatGPT-style)
     return {k: v for k, v in grouped.items() if v}
+
+def generate_and_update_title(conversation_id: str, first_message_content: str):
+    """
+    Orchestrator: Calls LLM to get title, then updates Supabase.
+    """
+    # 1. Get title from LLM
+    new_title = generate_chat_title(first_message_content)
+
+    # 2. Update Database
+    supabase = get_supabase()
+    supabase.table("conversations").update({
+        "topic_title": new_title,
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }).eq("id", conversation_id).execute()
+
+    print(f"✅ Auto-titled conversation {conversation_id} to: {new_title}")

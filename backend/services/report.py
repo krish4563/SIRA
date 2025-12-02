@@ -5,7 +5,7 @@ from __future__ import annotations
 import io
 import logging
 from datetime import datetime
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
@@ -18,9 +18,9 @@ from reportlab.platypus import (
     Spacer,
     Table,
     TableStyle,
+    ListFlowable,
+    ListItem
 )
-from services.history_service import compute_numeric_diff, fetch_latest_two_runs
-from services.llm_diff import llm_compare_runs
 from services.supabase_client import get_supabase
 
 logger = logging.getLogger(__name__)
@@ -28,12 +28,12 @@ logger = logging.getLogger(__name__)
 SIRA_BLUE = colors.HexColor("#1a73e8")
 SIRA_LIGHT_BLUE = colors.HexColor("#e8f1fb")
 SIRA_GREY = colors.HexColor("#555555")
+SIRA_LINK = colors.HexColor("#0000EE")
 
 
 # ----------------------------------------------------
-# Helpers
+# Shared Helpers
 # ----------------------------------------------------
-
 
 def _parse_iso(ts: Optional[str]) -> str:
     """Convert ISO timestamp to a nicer string, fallback to as-is."""
@@ -44,22 +44,6 @@ def _parse_iso(ts: Optional[str]) -> str:
         return dt.strftime("%d %b %Y, %I:%M %p")
     except Exception:
         return ts
-
-
-def _get_latest_run_only(job_id: str) -> Optional[Dict]:
-    """Fallback when there is only one run for a job."""
-    sb = get_supabase()
-    resp = (
-        sb.table("auto_research_history")
-        .select("*")
-        .eq("job_id", job_id)
-        .order("run_finished_at", desc=True)
-        .limit(1)
-        .execute()
-    )
-    rows = resp.data or []
-    return rows[0] if rows else None
-
 
 def _build_styles():
     styles = getSampleStyleSheet()
@@ -112,14 +96,73 @@ def _build_styles():
         textColor=colors.black,
     )
 
+    # --- CONVERSATION STYLES ---
+    user_msg_style = ParagraphStyle(
+        name="SIRA_UserMsg",
+        parent=styles["Heading3"],
+        fontName="Helvetica-Bold",
+        fontSize=12,
+        textColor=SIRA_BLUE,
+        spaceBefore=12,
+        spaceAfter=6,
+    )
+
+    meta_style = ParagraphStyle(
+        name="SIRA_Meta",
+        parent=styles["Normal"],
+        fontName="Helvetica-Oblique",
+        fontSize=9,
+        textColor=SIRA_GREY,
+    )
+
+    # Styles for Research Results
+    result_title_style = ParagraphStyle(
+        name="SIRA_ResultTitle",
+        parent=styles["Normal"],
+        fontName="Helvetica-Bold",
+        fontSize=11,
+        textColor=colors.black,
+        spaceBefore=6,
+    )
+
+    result_url_style = ParagraphStyle(
+        name="SIRA_ResultUrl",
+        parent=styles["Normal"],
+        fontName="Helvetica-Oblique",
+        fontSize=9,
+        textColor=SIRA_LINK,
+        spaceAfter=4,
+    )
+
     return {
         "title": title_style,
         "subtitle": subtitle_style,
         "section_header": section_header,
         "body": body,
         "mono": mono,
+        "user": user_msg_style,
+        "meta": meta_style,
+        "result_title": result_title_style,
+        "result_url": result_url_style
     }
 
+# ----------------------------------------------------
+# PART 1: TIMELINE REPORT GENERATION (Your Old Code)
+# ----------------------------------------------------
+
+def _get_latest_run_only(job_id: str) -> Optional[Dict]:
+    """Fallback when there is only one run for a job."""
+    sb = get_supabase()
+    resp = (
+        sb.table("auto_research_history")
+        .select("*")
+        .eq("job_id", job_id)
+        .order("run_finished_at", desc=True)
+        .limit(1)
+        .execute()
+    )
+    rows = resp.data or []
+    return rows[0] if rows else None
 
 def _build_header_table(topic: str, job_id: str, latest_run: Dict) -> Table:
     """Top bar with topic, job id, status, timestamp."""
@@ -155,7 +198,6 @@ def _build_header_table(topic: str, job_id: str, latest_run: Dict) -> Table:
         )
     )
     return table
-
 
 def _build_numeric_diff_table(numeric_diff: Optional[Dict]) -> Optional[Table]:
     if not numeric_diff:
@@ -205,16 +247,9 @@ def _build_numeric_diff_table(numeric_diff: Optional[Dict]) -> Optional[Table]:
     table.setStyle(TableStyle(style_cmds))
     return table
 
-
-# ----------------------------------------------------
-# Main entrypoint
-# ----------------------------------------------------
-
-
 def generate_report_for_job(job_id: str) -> bytes:
     """
     Build a SIRA-branded PDF report for a given job_id.
-    Returns raw PDF bytes (or b"" if job not found).
     """
     logger.info("[REPORT] Generating PDF report for job_id=%s", job_id)
 
@@ -223,8 +258,10 @@ def generate_report_for_job(job_id: str) -> bytes:
     numeric_diff: Optional[Dict] = None
     llm_diff_text: Optional[str] = None
 
-    # Try to get 2 runs (for diff). If not available, fall back to single run.
     try:
+        from services.history_service import compute_numeric_diff, fetch_latest_two_runs
+        from services.llm_diff import llm_compare_runs
+
         latest, previous = fetch_latest_two_runs(job_id)
         numeric_diff = compute_numeric_diff(latest, previous)
 
@@ -237,16 +274,10 @@ def generate_report_for_job(job_id: str) -> bytes:
                 topic=(latest.get("topic") or previous.get("topic") or "Unknown"),
             )
     except Exception as e:
-        logger.info(
-            "[REPORT] Fewer than 2 runs for job %s or diff error: %s. "
-            "Falling back to single-run report.",
-            job_id,
-            e,
-        )
+        logger.info("[REPORT] Job report fallback or error: %s", e)
         latest = _get_latest_run_only(job_id)
 
     if not latest:
-        logger.warning("[REPORT] No history found for job_id=%s", job_id)
         return b""
 
     topic = latest.get("topic") or "Untitled Topic"
@@ -268,86 +299,129 @@ def generate_report_for_job(job_id: str) -> bytes:
     )
 
     story = []
-
-    # --- Title ---
     story.append(Paragraph("SIRA Research Report", styles["title"]))
-    story.append(
-        Paragraph(
-            "Self-Initiated Research Agent (SIRA) — Auto-generated report",
-            styles["subtitle"],
-        )
-    )
-    story.append(Spacer(1, 6))
-
-    # --- Header card ---
     story.append(_build_header_table(topic, job_id, latest))
     story.append(Spacer(1, 12))
-
-    # --- Summary Section ---
     story.append(Paragraph("Latest Summary", styles["section_header"]))
-    story.append(
-        Paragraph(
-            "This is the most recent consolidated summary generated by SIRA for this topic.",
-            styles["body"],
-        )
-    )
-    story.append(Spacer(1, 4))
     story.append(Preformatted(full_summary, styles["mono"]))
-    story.append(Spacer(1, 10))
+    doc.build(story)
+    pdf_bytes = buf.getvalue()
+    buf.close()
+    return pdf_bytes
 
-    # --- Graph / KG Section (textual for now) ---
-    story.append(Paragraph("Knowledge Graph Snapshot", styles["section_header"]))
-    story.append(
-        Paragraph(
-            f"Graph complexity based on the latest run: <b>{kg_nodes}</b> nodes and <b>{kg_edges}</b> edges.",
-            styles["body"],
-        )
+
+# ----------------------------------------------------
+# PART 2: CONVERSATION REPORT GENERATION (UPDATED)
+# ----------------------------------------------------
+
+def _fetch_conversation_data(conversation_id: str):
+    supabase = get_supabase()
+    
+    # 1. Get Conversation Meta
+    conv_resp = supabase.table("conversations").select("*").eq("id", conversation_id).single().execute()
+    if not conv_resp.data:
+        raise ValueError("Conversation not found")
+    
+    # 2. Get Messages
+    msg_resp = (
+        supabase.table("messages")
+        .select("*")
+        .eq("conversation_id", conversation_id)
+        .order("timestamp", desc=False) 
+        .execute()
     )
-    story.append(Spacer(1, 8))
+    
+    return conv_resp.data, msg_resp.data or []
 
-    # --- Numeric Diff (if available) ---
-    if numeric_diff:
-        story.append(Paragraph("Run-to-Run Changes", styles["section_header"]))
-        story.append(
-            Paragraph(
-                "Below is a compact, color-coded view of how this run differs numerically from the previous one.",
-                styles["body"],
-            )
-        )
-        story.append(Spacer(1, 4))
+def generate_report_for_conversation(conversation_id: str) -> bytes:
+    """
+    Generates a PDF transcript including DEEP research results from metadata.
+    """
+    logger.info(f"[REPORT] Generating Deep Conversation PDF for {conversation_id}")
 
-        diff_table = _build_numeric_diff_table(numeric_diff)
-        if diff_table:
-            story.append(diff_table)
-            story.append(Spacer(1, 8))
+    try:
+        conversation, messages = _fetch_conversation_data(conversation_id)
+    except Exception as e:
+        logger.error(f"[REPORT] Failed to fetch data: {e}")
+        return b""
 
-    # --- LLM Diff (semantic) ---
-    if llm_diff_text:
-        story.append(
-            Paragraph(
-                "Semantic Diff (Latest vs Previous Run)", styles["section_header"]
-            )
-        )
-        story.append(
-            Paragraph(
-                "SIRA’s LLM comparison highlights what changed, disappeared, or shifted between the two runs.",
-                styles["body"],
-            )
-        )
-        story.append(Spacer(1, 4))
-        story.append(Preformatted(llm_diff_text, styles["mono"]))
-        story.append(Spacer(1, 10))
+    topic = conversation.get("topic_title") or "Untitled Research"
+    created_at = conversation.get("created_at", "")[:10] 
 
-    # --- Footer / branding ---
-    story.append(Spacer(1, 16))
-    story.append(
-        Paragraph(
-            "Report generated automatically by <b>SIRA</b>. For best results, schedule recurring research jobs and compare changes over time.",
-            styles["body"],
-        )
+    styles = _build_styles()
+    buf = io.BytesIO()
+
+    doc = SimpleDocTemplate(
+        buf,
+        pagesize=A4,
+        leftMargin=20 * mm,
+        rightMargin=20 * mm,
+        topMargin=25 * mm,
+        bottomMargin=20 * mm,
+        title=f"SIRA Report — {topic}",
     )
+
+    story = []
+
+    # --- Title Section ---
+    story.append(Paragraph("SIRA Research Report", styles["title"]))
+    story.append(Paragraph(f"Topic: {topic}", styles["user"]))
+    story.append(Paragraph(f"Date: {created_at}", styles["meta"]))
+    story.append(Spacer(1, 20))
+
+    # --- Messages Loop ---
+    for msg in messages:
+        role = msg.get("role")
+        content = msg.get("content", "")
+        
+        # Safe format
+        formatted_content = content.replace("\n", "<br/>")
+
+        if role == "user":
+            # User Question
+            story.append(Paragraph(f"❓ Query:", styles["user"]))
+            story.append(Paragraph(content, styles["body"])) 
+        
+        elif role in ["agent", "assistant"]:
+            # AI Intro Message
+            story.append(Paragraph(f"💡 Insight:", styles["user"]))
+            story.append(Paragraph(formatted_content, styles["body"]))
+            
+            # ----------------------------------------------------
+            #  👇 NEW LOGIC: Extract Research Results from Metadata
+            # ----------------------------------------------------
+            meta = msg.get("meta") or {}
+            results = meta.get("results", [])
+
+            if results:
+                story.append(Spacer(1, 8))
+                story.append(Paragraph(f"Detailed Research Findings ({len(results)} Sources):", styles["section_header"]))
+                
+                for idx, item in enumerate(results, 1):
+                    # Item usually has: title, summary, url, credibility
+                    r_title = item.get("title", "No Title")
+                    r_summary = item.get("summary") or item.get("content") or "No summary available."
+                    r_url = item.get("url", "#")
+                    
+                    # Create a block for each result
+                    story.append(Paragraph(f"{idx}. {r_title}", styles["result_title"]))
+                    story.append(Paragraph(f"Source: {r_url}", styles["result_url"]))
+                    story.append(Paragraph(r_summary, styles["body"]))
+                    story.append(Spacer(1, 6))
+
+        story.append(Spacer(1, 12))
+        # Divider line
+        story.append(Table([[""]], colWidths=[170*mm], style=[
+            ('LINEBELOW', (0,0), (-1,-1), 0.5, colors.lightgrey)
+        ]))
+        story.append(Spacer(1, 12))
+
+    # --- Footer ---
+    story.append(Spacer(1, 20))
+    story.append(Paragraph("Generated by SIRA - Self Initiated Research Agent", styles["meta"]))
 
     doc.build(story)
     pdf_bytes = buf.getvalue()
     buf.close()
+    
     return pdf_bytes

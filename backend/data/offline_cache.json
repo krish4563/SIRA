@@ -700,5 +700,413 @@
     "title": "How random forests really work",
     "url": "https://www.kaggle.com/code/jhoward/how-random-forests-really-work",
     "text": "In this notebook, we're going to learn all about Random Forests, by building one from scratch, and using it to submit to the Titanic competition!"
+  },
+  {
+    "topic": "i want to know about human eye detection methods",
+    "title": "How do eye trackers work? — A tech-savvy walk-through",
+    "url": "https://www.tobii.com/resource-center/learn-articles/how-do-eye-trackers-work",
+    "text": "1. Illumination of the eyes. Tobii eye trackers use near-infrared spectrum light to illuminate the eyes and create light reflection patterns onto each eye."
+  },
+  {
+    "topic": "i want to know about human eye detection methods",
+    "title": "Eye tracking",
+    "url": "https://en.wikipedia.org/wiki/Eye_tracking",
+    "text": "There are several methods for measuring eye movement, with the most popular variant using video images to extract eye position. Other methods use search coils ..."
+  },
+  {
+    "topic": "i want to know about human eye detection methods",
+    "title": "Eye Tracking 101: What Is It & How Does It Work In Real Life?",
+    "url": "https://eyeware.tech/blog/what-is-eye-tracking/",
+    "text": "Eye tracking enables the measurement of eye movements, eye positions, and points of gaze through various technological processes."
+  },
+  {
+    "topic": "i want to know about human eye detection methods",
+    "title": "Understanding Eye Tracking Technology: How Does It Work?",
+    "url": "https://www.allaboutvision.com/resources/human-interest/how-do-eye-trackers-work/",
+    "text": "Eye tracking technology is a tool used to measure the movement of a person's eyes. It collects data about eye position, how the eyes move and what they focus ..."
+  },
+  {
+    "topic": "i want to know about human nose detection methos",
+    "title": "How the nose decodes complex odors",
+    "url": "https://www.nih.gov/news-events/nih-research-matters/how-nose-decodes-complex-odors",
+    "text": "Using an advanced 3D imaging technique, researchers showed how receptors in the nose help decode the smell of complex odor mixtures in mice."
+  },
+  {
+    "topic": "i want to know about human nose detection methos",
+    "title": "Artificial 'nose' tells people when certain smells are present",
+    "url": "https://www.science.org/content/article/artificial-nose-tells-people-when-certain-smells-are-present",
+    "text": "Humans have about 400 different olfactory receptors that are thought to enable the nose to detect billions of odors. But people can lose ..."
+  },
+  {
+    "topic": "i want to know about human nose detection methos",
+    "title": "Electronic nose",
+    "url": "https://en.wikipedia.org/wiki/Electronic_nose",
+    "text": "An electronic nose (or eNose) is an electronic sensing device intended to detect odors or flavors. The expression \"electronic sensing\" refers to the capability ..."
+  },
+  {
+    "topic": "i want to know about human nose detection methos",
+    "title": "Nasal Endoscopy: Procedure Details & Results",
+    "url": "https://my.clevelandclinic.org/health/diagnostics/22156-nasal-endoscopy",
+    "text": "A nasal endoscopy is a procedure that looks at your nose and sinuses. It uses a flexible tube with a light and a camera. It takes about five minutes to ..."
+  },
+  {
+    "topic": "i want to know about human nose detection methos",
+    "title": "An electronic nose can identify humans by the smell of their ear",
+    "url": "https://academic.oup.com/chemse/article/doi/10.1093/chemse/bjad053/7573507",
+    "text": "We conclude that humans can indeed be identified from the smell of their ear, but the results did not imply a consistent advantage over other bodily odor ..."
+  },
+  {
+    "topic": "i want to know about human head detection method",
+    "title": "AUTOMATIC DETECTION AND TRACKING OF HUMAN ...",
+    "url": "https://www.worldscientific.com/doi/full/10.1142/S0218001400000118?srsltid=AfmBOoo77P9ZCR3W-LpfcHrYdZQDh-Lm-Mj-sDGQgdR0j-Jzyxb-oGyg",
+    "text": "By using an elliptical model for the human head, our Maximum Likelihood (ML) head detector can reliably locate human heads in images having complex backgrounds ..."
+  },
+  {
+    "topic": "i want to know about human head detection method",
+    "title": "Head Detection and Tracking for Monitoring Human ...",
+    "url": "https://www.sciencedirect.com/science/article/abs/pii/B9780444518132500373",
+    "text": "This chapter describes a mobile manipulator for monitoring and support of human activity in home and office to maintain security. The mobile manipulator is ..."
+  },
+  {
+    "topic": "i want to know about human head detection method",
+    "title": "Scientists Detect Light Traversing the Entire Human Head ...",
+    "url": "https://www.zmescience.com/science/neurology-science/scientists-detect-light-traversing-the-entire-human-head-opening-a-window-to-the-brains-deepest-regions/",
+    "text": "The technique, called functional near-infrared spectroscopy, or fNIRS, has become a workhorse for neuroscientists. It's affordable, noninvasive, ..."
+  },
+  {
+    "topic": "i want to know about human head detection method",
+    "title": "Human Head Detection Tutorial for People Counting ...",
+    "url": "https://medium.com/@staytechrich/human-head-detection-tutorial-for-people-counting-yolov8-vs-faster-r-cnn-633cf57534d8",
+    "text": "This tutorial will guide you through detecting heads in an image using two popular models: YOLOv8 (Fast & Easy), Faster R-CNN (Accurate but Slower)."
+  },
+  {
+    "topic": "i want to know about human hand detection method",
+    "title": "Hand landmarks detection guide | Google AI Edge",
+    "url": "https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker",
+    "text": "The MediaPipe Hand Landmarker task lets you detect the landmarks of the hands in an image. You can use this task to locate key points of hands and render ..."
+  },
+  {
+    "topic": "i want to know about human hand detection method",
+    "title": "A review on deep learning for vision-based hand detection ...",
+    "url": "https://www.sciencedirect.com/science/article/pii/S0736584525001644",
+    "text": "Precise hand segmentation enables robots to accurately distinguish human hands from background clutter, facilitating safe and efficient collaboration in shared ..."
+  },
+  {
+    "topic": "i want to know about human hand detection method",
+    "title": "Hand Detection Tracking in Python using OpenCV and ...",
+    "url": "https://medium.com/aditee-gautam/hand-recognition-using-opencv-a7b109941c88",
+    "text": "MediaPipe's Hand module utilizes key points to detect and track hands in images or video frames. These key points, also known as landmarks, ..."
+  },
+  {
+    "topic": "i want to know about human hand detection method",
+    "title": "A Structured and Methodological Review on Vision-Based ...",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9224857/",
+    "text": "An efficient method for human hand gesture detection and recognition using deep learning convolutional neural networks. Soft Comput. 2020;24 ..."
+  },
+  {
+    "topic": "i want to know about human leg detection method.",
+    "title": "LEGS DETECTION USING A LASER RANGE FINDER FOR ...",
+    "url": "https://www.scitepress.org/papers/2010/28805/28805.pdf",
+    "text": "The principal aim of the proposed method is to estimate the human position using data provided by a Laser Range Finder (LRF). The method utilizes two Finite ..."
+  },
+  {
+    "topic": "i want to know about human leg detection method.",
+    "title": "Development of a human-following scheme using point- ...",
+    "url": "https://journals.sagepub.com/doi/10.1177/17298806241287313",
+    "text": "This study proposes a 3D laser-based human leg detection and tracking framework to improve the robustness of human-following for autonomous mobile robots."
+  },
+  {
+    "topic": "i want to know about human leg detection method.",
+    "title": "Methods for Assessing Leg Length Discrepancy - PMC",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2628227/",
+    "text": "The currently available imaging modalities include plain radiography, computed radiography, microdose digital radiography, ultrasonography, CT, and MRI."
+  },
+  {
+    "topic": "i want to know about human leg detection method.",
+    "title": "Detection of the Leg-Crossing Position Using Pressure ...",
+    "url": "https://www.mdpi.com/2078-2489/15/12/810",
+    "text": "Detecting unconscious leg crossing is important for promoting correct posture. In this study, we investigated the detection of leg-crossing postures using ..."
+  },
+  {
+    "topic": "i want to know about human leg detection method.",
+    "title": "A real-time pedestrian legs detection and tracking system ...",
+    "url": "https://ieeexplore.ieee.org/document/7988208/",
+    "text": "In this paper, we develop a real-time pedestrian legs detection and tracking system that emphasizes on targeting the lower part of a human body."
+  },
+  {
+    "topic": "i want to know about black hole",
+    "title": "Black Hole Basics",
+    "url": "https://science.nasa.gov/universe/black-holes/",
+    "text": "A black hole is so dense that gravity just beneath its surface, the event horizon, is strong enough that nothing – not even light – can escape."
+  },
+  {
+    "topic": "i want to know about black hole",
+    "title": "Black hole",
+    "url": "https://en.wikipedia.org/wiki/Black_hole",
+    "text": "A black hole is an astronomical body so compact that its gravity prevents anything from escaping, even light. Albert Einstein's theory of general relativity ..."
+  },
+  {
+    "topic": "i want to know about black hole",
+    "title": "What are black holes, exactly? : r/cosmology",
+    "url": "https://www.reddit.com/r/cosmology/comments/16444lc/what_are_black_holes_exactly/",
+    "text": "Black holes are regions of spacetime warped so extremely that the speed needed for anything to escape it is greater than the speed of light."
+  },
+  {
+    "topic": "i want to know about black hole",
+    "title": "Black holes — Everything you need to know",
+    "url": "https://www.space.com/15421-black-holes-facts-formation-discovery-sdcmp.html",
+    "text": "Black holes have three \"layers\": the outer and inner event horizon, and the singularity. The event horizon of a black hole is the boundary ..."
+  },
+  {
+    "topic": "i want to know about black hole's theory of gravity.",
+    "title": "Why do we theorize the inside of a black hole is ...",
+    "url": "https://www.reddit.com/r/AskPhysics/comments/18u0nlv/why_do_we_theorize_the_inside_of_a_black_hole_is/",
+    "text": "The short jargon answer is that within the event horizon the force of gravity overcomes all known forces / binding energies and therefore ..."
+  },
+  {
+    "topic": "i want to know about natural satelite",
+    "title": "Natural satellite",
+    "url": "https://en.wikipedia.org/wiki/Natural_satellite",
+    "text": "A natural satellite is, in the most common usage, an astronomical body that orbits a planet, dwarf planet, or small Solar System body"
+  },
+  {
+    "topic": "i want to know about natural satelite",
+    "title": "Natural satellites",
+    "url": "https://www.sciencelearn.org.nz/resources/271-natural-satellites",
+    "text": "A natural satellite is any celestial body in space that orbits around a larger body. Moons are called natural satellites because they orbit planets."
+  },
+  {
+    "topic": "i want to know about natural satelite",
+    "title": "Moons of Our Solar System",
+    "url": "https://science.nasa.gov/solar-system/moons/",
+    "text": "Moons – also called natural satellites – come in many shapes, sizes and types. They are generally solid bodies, and a few have atmospheres. Get the Facts."
+  },
+  {
+    "topic": "i want to know about aritficial satelite",
+    "title": "Artificial satellites",
+    "url": "https://www.sciencelearn.org.nz/resources/269-artificial-satellites",
+    "text": "An artificial satellite is an object that people have made and launched into orbit using rockets. There are currently over 3000 active ..."
+  },
+  {
+    "topic": "i want to know about aritficial satelite",
+    "title": "Satellite",
+    "url": "https://en.wikipedia.org/wiki/Satellite",
+    "text": "A satellite or an artificial satellite is an object, typically a spacecraft, placed into orbit around a celestial body. They have a variety of uses, including ..."
+  },
+  {
+    "topic": "i want to know about bitcoin prices and updates",
+    "title": "Bitcoin Price, BTC Price, Live Charts, and Marketcap",
+    "url": "https://www.coinbase.com/price/bitcoin",
+    "text": "Price of BTC is $91,479.99 right now. Looking at Bitcoin's historical prices, it's 6% up from the previous week's price of $85,820.01, and observed a 0% ..."
+  },
+  {
+    "topic": "i want to know about bitcoin prices and updates",
+    "title": "Bitcoin price today, BTC to USD live price, marketcap ...",
+    "url": "https://coinmarketcap.com/currencies/bitcoin/",
+    "text": "The live Bitcoin price today is $91327.40 USD with a 24-hour trading volume of $37583294180.66 USD. We update our BTC to USD price in real-time."
+  },
+  {
+    "topic": "i want to know about bitcoin prices and updates",
+    "title": "Bitcoin price today - BTC price chart & live trends",
+    "url": "https://www.kraken.com/prices/bitcoin",
+    "text": "Bitcoin price today is $91,244.00. In the last 24 hours Bitcoin's price moved +0.50%. The current BTC to USD conversion rate is $91,244.00 per BTC."
+  },
+  {
+    "topic": "i want to compare usd to inr for last 5 years",
+    "title": "US dollar to Indian rupees Exchange Rate History",
+    "url": "https://wise.com/us/currency-converter/usd-to-inr-rate/history",
+    "text": "Dive into historical exchange rates for USD to INR with Wise's currency converter. Analyse past currency performance, track trends, and discover how ..."
+  },
+  {
+    "topic": "i want to compare usd to inr for last 5 years",
+    "title": "USD INR Historical Data",
+    "url": "https://www.investing.com/currencies/usd-inr-historical-data",
+    "text": "What Is the Historical Performance of USD/INR? ... Over the past year, USD/INR has changed by 5.670%, trading within a 52-week range of 83.765 to 89.734."
+  },
+  {
+    "topic": "i want to compare usd to inr for last 5 years",
+    "title": "US Dollar to Indian Rupee Exchange Rate Chart",
+    "url": "https://www.xe.com/en-us/currencycharts/?from=USD&to=INR",
+    "text": "USD to INR currency chart. XE's free live currency conversion chart for US Dollar to Indian Rupee allows you to pair exchange rate history for up to 10 years."
+  },
+  {
+    "topic": "i want to compare usd to inr for last 5 years",
+    "title": "US Dollar (USD) to Indian Rupee (INR) exchange rate history",
+    "url": "https://www.exchangerates.org.uk/USD-INR-exchange-rate-history.html",
+    "text": "Table of 1 US Dollar to Indian Rupee Exchange Rate ; Saturday 6 September 2025 · Friday 5 September 2025 ; 1 USD = 88.186 INR · 1 USD = 88.188 INR ; 87.615 · 88.155 ..."
+  },
+  {
+    "topic": "i want to compare usd to inr for last 5 years",
+    "title": "Indian Rupee - Quote - Chart - Historical Data - News",
+    "url": "https://tradingeconomics.com/india/currency",
+    "text": "The Indian Rupee touched 88.93 against the USD, the lowest since September 2025. Over the past 4 weeks, US Dollar Indian Rupee gained 1.26%, and in the last 12 ..."
+  },
+  {
+    "topic": "tell me about fuel price prediction",
+    "title": "What are the projections for U.S. gasoline and diesel fuel ...",
+    "url": "https://www.eia.gov/tools/faqs/faq.php?id=31&t=9",
+    "text": "The US Energy Information Administration publishes projections for the prices of US gasoline and diesel fuel in the: Short-Term Energy Outlook, Annual Energy ..."
+  },
+  {
+    "topic": "tell me about fuel price prediction",
+    "title": "Gas (GAS) Price Prediction 2025 2026 2027 - 2030",
+    "url": "https://changelly.com/blog/gas-gas-price-prediction/",
+    "text": "Based on their predictions, the estimated average GAS price will be around $22.1. It might drop to a minimum of $21.3, but it still might reach $27 throughout ..."
+  },
+  {
+    "topic": "tell me about fuel price prediction",
+    "title": "Gasoline - Price - Chart - Historical Data - News",
+    "url": "https://tradingeconomics.com/commodity/gasoline",
+    "text": "Gasoline is expected to trade at 1.84 USD/GAL by the end of this quarter, according to Trading Economics global macro models and analysts expectations. Looking ..."
+  },
+  {
+    "topic": "tell me about fuel price prediction",
+    "title": "Kiplinger Energy Outlook: Low Gas Prices for Thanksgiving",
+    "url": "https://www.kiplinger.com/economic-forecasts/energy",
+    "text": "Truckers hauling holiday items will pay a bit more for diesel, though. It is averaging $3.79 per gallon nationwide, up from $3.54 a year ago."
+  },
+  {
+    "topic": "tell me about fuel price prediction",
+    "title": "Short-Term Energy Outlook",
+    "url": "https://www.eia.gov/outlooks/steo/",
+    "text": "We expect gasoline prices to fall below $3.00 per gal (gal) on average in 2026, down 10% from 2024, and diesel prices to fall to $3.50/gal in 2026, down 7% from ..."
+  },
+  {
+    "topic": "i want to know about galaxy",
+    "title": "Galaxy Basics",
+    "url": "https://science.nasa.gov/universe/galaxies/",
+    "text": "Galaxies consist of stars, planets, and vast clouds of gas and dust, all bound together by gravity. The largest contain trillions of stars."
+  },
+  {
+    "topic": "i want to know about galaxy",
+    "title": "Galaxy",
+    "url": "https://en.wikipedia.org/wiki/Galaxy",
+    "text": "A galaxy is a system of stars, stellar remnants, interstellar gas, dust, and dark matter bound together by gravity. The word is derived from the Greek ..."
+  },
+  {
+    "topic": "i want to know about galaxy",
+    "title": "What Is a Galaxy?",
+    "url": "https://spaceplace.nasa.gov/galaxy/",
+    "text": "The Short Answer: A galaxy is a huge collection of gas, dust, and billions of stars and their solar systems, all held together by gravity."
+  },
+  {
+    "topic": "i want to know about types of galaxy.",
+    "title": "Galaxy Types",
+    "url": "https://science.nasa.gov/universe/galaxies/types/",
+    "text": "Types of Galaxies. Scientists sometimes categorize galaxies based on their shapes and physical features. Other classifications organize ..."
+  },
+  {
+    "topic": "i want to know about types of galaxy.",
+    "title": "Types of Galaxies | Pictures, Facts, and Information",
+    "url": "https://astrobackyard.com/types-of-galaxies/",
+    "text": "There are four distinct types of galaxies in the universe, elliptical, spiral, barred spiral, and irregular."
+  },
+  {
+    "topic": "i want to know about types of galaxy.",
+    "title": "Galaxy - Elliptical, Spiral, Irregular",
+    "url": "https://www.britannica.com/science/galaxy/Types-of-galaxies",
+    "text": "Galaxy - Elliptical, Spiral, Irregular: Almost all current systems of galaxy classification are outgrowths of the initial scheme proposed by ..."
+  },
+  {
+    "topic": "i want to know about types of galaxy.",
+    "title": "Galaxy Classification",
+    "url": "https://lco.global/spacebook/galaxies/galaxy-classification/",
+    "text": "Galaxies are classified into four main types: spirals, barred spirals, ellipticals, and irregulars. Ellipticals are egg-shaped, while spirals have a disc and ..."
+  },
+  {
+    "topic": "i want to know about hand gesture detection method",
+    "title": "Gesture recognition task guide | Google AI Edge",
+    "url": "https://ai.google.dev/edge/mediapipe/solutions/vision/gesture_recognizer",
+    "text": "The MediaPipe Gesture Recognizer task lets you recognize hand gestures in real time, and provides the recognized hand gesture results along with the landmarks ..."
+  },
+  {
+    "topic": "ai in healthcare domain",
+    "title": "Artificial Intelligence in healthcare - Public Health - European ...",
+    "url": "https://health.ec.europa.eu/ehealth-digital-health-and-care/artificial-intelligence-healthcare_en",
+    "text": "AI can reduce costs and streamline administrative tasks like patient scheduling, billing, and electronic health records management by automating and optimising ..."
+  },
+  {
+    "topic": "ai in healthcare domain",
+    "title": "AI in healthcare domain",
+    "url": "https://jklst.org/index.php/home/article/view/85",
+    "text": "This paper provides an overview of recent developments and applications of AI in healthcare, highlighting its potential to enhance efficiency, ..."
+  },
+  {
+    "topic": "ai in healthcare domain",
+    "title": "How is AI being Used in the Healthcare Industry",
+    "url": "https://www.lapu.edu/post/ai-health-care-industry",
+    "text": "Advantages of AI in Healthcare: · Improved diagnostics and precision medicine · Streamlined administrative tasks and workflow · Enhanced research ..."
+  },
+  {
+    "topic": "ai in healthcare domain",
+    "title": "Artificial Intelligence In Health And Health Care: Priorities ...",
+    "url": "https://www.healthaffairs.org/doi/10.1377/hlthaff.2024.01003",
+    "text": "We focus on four strategic areas: ensuring safe, effective, and trustworthy use of AI; promotion and development of an AI-competent health care workforce."
+  },
+  {
+    "topic": "ai in healthcare domain",
+    "title": "The Benefits of the Latest AI Technologies for Patients and ...",
+    "url": "https://learn.hms.harvard.edu/insights/all-insights/benefits-latest-ai-technologies-patients-and-clinicians",
+    "text": "AI can automate tasks to free up a clinician's time to focus more on their patients, “humanizing” care in new ways. With many health care ..."
+  },
+  {
+    "topic": "in particular of dental surgeon how it actually does?",
+    "title": "Oral Surgery: Uses, Procedures & Recovery",
+    "url": "https://my.clevelandclinic.org/health/procedures/oral-surgery",
+    "text": "Oral surgery refers to any operation done inside your mouth. Examples include tooth extractions, dental implants, bone grafts and gum grafts."
+  },
+  {
+    "topic": "in particular of dental surgeon how it actually does?",
+    "title": "What does a dental surgeon actually do?",
+    "url": "https://yaremadental.com/en/articles/what-does-a-dental-surgeon-actually-do/",
+    "text": "Dental professionals work together to maintain oral health, assess its condition, correct deficiencies, and perform procedures in patients' mouths and teeth ..."
+  },
+  {
+    "topic": "how we can integrate ai in it?",
+    "title": "How do I implement an AI into my project? : r/webdev",
+    "url": "https://www.reddit.com/r/webdev/comments/18qc1dn/how_do_i_implement_an_ai_into_my_project/",
+    "text": "I wished to incorporate an AI into a web application that's a simplified version of Reddit, that would offer the ability to chat with it, what is the best way ..."
+  },
+  {
+    "topic": "how we can integrate ai in it?",
+    "title": "8 steps to successful AI integration",
+    "url": "https://www.rst.software/blog/8-steps-to-successful-ai-integration",
+    "text": "Step 1: – Identify the problem you want to solve through AI integration · Step 2: Create a clear AI integration strategy · Step 3: Ensure internal data quality, ..."
+  },
+  {
+    "topic": "how we can integrate ai in it?",
+    "title": "How can I integrate AI in my Website?",
+    "url": "https://learn.microsoft.com/en-us/answers/questions/5489120/how-can-i-integrate-ai-in-my-website",
+    "text": "I want to integrate an AI or AI product into my website, which focuses on the topic of learning and earning. Basically, I have integrated a few ..."
+  },
+  {
+    "topic": "how we can integrate ai in it?",
+    "title": "How to Integrate AI into Your App: 7 Steps Guide",
+    "url": "https://www.uptech.team/blog/how-to-integrate-ai-into-an-app",
+    "text": "To integrate AI into an app, you need a team with different skills working together. No single person can cover everything — each role adds ..."
+  },
+  {
+    "topic": "how we can integrate ai in it?",
+    "title": "How Do I Integrate AI Into My Product—Ideally By Yesterday",
+    "url": "https://www.mindset.ai/blogs/how-do-you-integrate-ai-into-a-product",
+    "text": "Your AI service can connect directly to your SQL database, analyze historical sales data, and return forecasts. The predictions get stored back ..."
+  },
+  {
+    "topic": "how we can integrate ai in it?",
+    "title": "How to make AI work for your business: A 7-step guideline",
+    "url": "https://een.ec.europa.eu/blog/how-make-ai-work-your-business-7-step-guideline",
+    "text": "1. Identify key areas for AI integration. Start by finding areas where AI can make the biggest impact. · 2. Set clear objectives · 3. Redesign ..."
+  },
+  {
+    "topic": "can we integrate ai and robotics both together in this industry?",
+    "title": "9 Real-Life Applications of AI in Robotics [By Industry]",
+    "url": "https://onlinedegrees.sandiego.edu/application-of-ai-in-robotics/",
+    "text": "With this integration of AI and robotics, we can expect to see significant advancements in a wide range of industries, from manufacturing and healthcare to ..."
+  },
+  {
+    "topic": "can we integrate ai and robotics both together in this industry?",
+    "title": "Applications of AI in Robotics: Industry Breakdown",
+    "url": "https://ep.jhu.edu/news/applications-of-ai-in-robotics-industry-breakdown/",
+    "text": "Robotic arms enhanced with AI can adapt to variations in materials, perform intricate assembly tasks, and identify defects instantly through ..."
   }
 ]

@@ -51,7 +51,7 @@ RATE_LIMITS: Dict[str, Dict[str, float]] = {
 # ────────────────────────────────────────────────────────
 
 
-def serpapi_search(topic: str) -> List[Dict[str, Any]]:
+def serpapi_search(topic: str, max_results: int = 5) -> List[Dict[str, Any]]:
     """Fetch results from SerpAPI (Google Search)."""
     try:
         if not SERPAPI_KEY:
@@ -62,7 +62,7 @@ def serpapi_search(topic: str) -> List[Dict[str, Any]]:
             "q": topic,
             "api_key": SERPAPI_KEY,
             "engine": "google",
-            "num": 5,
+            "num": max_results,
         }
 
         r = requests.get(url, params=params, timeout=20)
@@ -70,7 +70,7 @@ def serpapi_search(topic: str) -> List[Dict[str, Any]]:
         data = r.json()
 
         results: List[Dict[str, Any]] = []
-        for item in data.get("organic_results", []):
+        for item in data.get("organic_results", [])[:max_results]:
             results.append(
                 {
                     "title": item.get("title"),
@@ -86,7 +86,7 @@ def serpapi_search(topic: str) -> List[Dict[str, Any]]:
         return []
 
 
-def brave_search(topic: str) -> List[Dict[str, Any]]:
+def brave_search(topic: str, max_results: int = 5) -> List[Dict[str, Any]]:
     """Fetch results from Brave Search."""
     try:
         if not BRAVE_KEY:
@@ -97,14 +97,14 @@ def brave_search(topic: str) -> List[Dict[str, Any]]:
             "Accept": "application/json",
             "X-Subscription-Token": BRAVE_KEY,
         }
-        params = {"q": topic, "count": 5}
+        params = {"q": topic, "count": max_results}
 
         r = requests.get(url, headers=headers, params=params, timeout=20)
         r.raise_for_status()
         data = r.json()
 
         results: List[Dict[str, Any]] = []
-        for item in data.get("web", {}).get("results", []):
+        for item in data.get("web", {}).get("results", [])[:max_results]:
             results.append(
                 {
                     "title": item.get("title"),
@@ -120,12 +120,14 @@ def brave_search(topic: str) -> List[Dict[str, Any]]:
         return []
 
 
-def ddg_search(topic: str) -> List[Dict[str, Any]]:
+def ddg_search(topic: str, max_results: int = 5) -> List[Dict[str, Any]]:
     """DuckDuckGo 'logical' provider – actually just offline cache here."""
     logger.info("[DDG] Using offline fallback for '%s'", topic)
-    return get_offline_results(topic)
+    offline_results = get_offline_results(topic)
+    return offline_results[:max_results]
 
 
+# ✅ PROVIDER_FUNCTIONS MUST BE DEFINED AFTER THE FUNCTIONS
 PROVIDER_FUNCTIONS = {
     "serpapi": serpapi_search,
     "brave": brave_search,
@@ -219,21 +221,27 @@ def apply_rate_limit(provider: str):
 # ────────────────────────────────────────────────────────
 
 
-def search_and_extract(topic: str) -> List[Dict[str, Any]]:
+def search_and_extract(topic: str, max_results: int = 5) -> List[Dict[str, Any]]:
     """
     Unified search entrypoint for the pipeline.
     - Picks best provider (SerpAPI → Brave → DDG/Offline)
     - Applies rate limiting
     - Tracks quota & provider health
     - Saves successful results to offline cache
+    
+    Args:
+        topic: Search query
+        max_results: Maximum number of results to return (default: 5)
     """
     provider = pick_provider()
-    logger.info("[RETRIEVER] Using provider '%s' for topic '%s'", provider, topic)
+    logger.info("[RETRIEVER] Using provider '%s' for topic '%s' (max_results=%d)", 
+                provider, topic, max_results)
 
     apply_rate_limit(provider)
 
     try:
-        raw_results = PROVIDER_FUNCTIONS[provider](topic)
+        # Call provider function with max_results
+        raw_results = PROVIDER_FUNCTIONS[provider](topic, max_results)
 
         if not raw_results:
             raise ValueError("Empty results from provider")
@@ -241,11 +249,14 @@ def search_and_extract(topic: str) -> List[Dict[str, Any]]:
         # Track success & quota
         mark_success(provider)
 
-        # Save full results (snippets or text) into offline cache (which will expand to full HTML where needed)
+        # Save full results (snippets or text) into offline cache
         save_to_cache(topic, raw_results)
 
-        # Normalize for downstream pipeline (summarizer, critic, KG)
-        return normalize(raw_results, provider)
+        # Normalize for downstream pipeline
+        normalized = normalize(raw_results, provider)
+        
+        # Limit results to max_results (extra safety)
+        return normalized[:max_results]
 
     except Exception as e:
         logger.warning(
@@ -253,4 +264,4 @@ def search_and_extract(topic: str) -> List[Dict[str, Any]]:
         )
         mark_failure(provider)
         # recursive retry with another provider
-        return search_and_extract(topic)
+        return search_and_extract(topic, max_results)

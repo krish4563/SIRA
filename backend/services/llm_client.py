@@ -1,240 +1,134 @@
 # services/llm_client.py
 
 import logging
-from typing import Dict
+import re
+import os
+from openai import OpenAI
 
-from config import settings
-from openai import APIConnectionError, OpenAI, OpenAIError, RateLimitError
-
-logger = logging.getLogger(__name__)
-
-# ============================================================
-# CONFIG
-# ============================================================
-
-OPENAI_API_KEY = settings.openai_api_key
-MODEL = settings.summarizer_model  # "gpt-4.1-mini" by default
+# Load Config
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+MODEL = "gpt-4o-mini" 
 
 if not OPENAI_API_KEY:
-    raise RuntimeError("OPENAI_API_KEY missing in .env file")
+    print("⚠️ WARNING: OPENAI_API_KEY is missing. LLM features will default to fallbacks.")
 
-# Force correct endpoint (prevents conflicts from OPENAI_BASE_URL)
-client = OpenAI(
-    api_key=OPENAI_API_KEY,
-    base_url="https://api.openai.com/v1",
-)
+client = OpenAI(api_key=OPENAI_API_KEY)
+logger = logging.getLogger(__name__)
 
-# ============================================================
-# SUMMARIZER
-# ============================================================
-
-
-def summarize_text(text: str, max_words: int = 120) -> str:
-    """Summarize using GPT in a safe and stable way."""
-    if not text or not text.strip():
+# ------------------------------------------------------------------
+# 1. CORE COMPLETION 
+# ------------------------------------------------------------------
+async def run_chat_completion(prompt: str, json_mode: bool = False) -> str:
+    """Generic wrapper for OpenAI chat completions."""
+    if not OPENAI_API_KEY:
         return ""
 
-    logger.info("[LLM] Summarizing text (%d chars)...", len(text))
+    try:
+        response = client.chat.completions.create(
+            model=MODEL,
+            messages=[{"role": "user", "content": prompt}],
+            response_format={"type": "json_object"} if json_mode else {"type": "text"},
+            temperature=0.3, 
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        logger.error(f"[LLM] Completion failed: {e}")
+        return ""
+
+# ------------------------------------------------------------------
+# 2. SUMMARIZER 
+# ------------------------------------------------------------------
+def summarize_text(text: str, max_words: int = 150) -> str:
+    """Summarizes raw text into a concise paragraph."""
+    if not text or not OPENAI_API_KEY:
+        return text[:500] + "..." 
 
     prompt = f"""
-Summarize the following content in under {max_words} words.
-Keep it factual, concise, structured, and avoid hallucinations.
-
-TEXT:
-{text}
-"""
-
+    Summarize the following text in under {max_words} words. 
+    Focus on facts, dates, and key outcomes.
+    
+    TEXT:
+    {text[:4000]}
+    """
     try:
         resp = client.chat.completions.create(
             model=MODEL,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.2,
+            max_tokens=200
         )
         return resp.choices[0].message.content.strip()
-
-    except APIConnectionError as e:
-        logger.error("[LLM ERROR - summarize_text] APIConnectionError: %r", e)
-    except RateLimitError as e:
-        logger.error("[LLM ERROR - summarize_text] RateLimitError: %r", e)
-    except OpenAIError as e:
-        logger.error("[LLM ERROR - summarize_text] OpenAIError: %r", e)
     except Exception as e:
-        logger.error("[LLM ERROR - summarize_text] Unexpected: %r", e)
+        logger.error(f"[LLM] Summarization failed: {e}")
+        return text[:500] + "..."
 
-    return "Summary unavailable due to API error."
+# ------------------------------------------------------------------
+# 3. EVALUATOR / CRITIC (Renamed back to evaluate_source)
+# ------------------------------------------------------------------
+def evaluate_source(url: str, content: str = "", title: str = "", topic: str = "") -> float:
+    """
+    Returns a float 0.0 - 1.0 representing credibility/relevance.
+    Updated signature to support old calls (url, content) and new calls (title, topic).
+    """
+    if not OPENAI_API_KEY:
+        return 0.5
 
-
-# ============================================================
-# CREDIBILITY SCORING
-# ============================================================
-
-
-def evaluate_source(url: str, content: str) -> float:
-    """Evaluate credibility 0–1 using GPT."""
-    logger.info("[LLM] Evaluating credibility for: %s", url)
-
+    # Construct a robust prompt regardless of missing fields
     prompt = f"""
-Return ONLY a number between 0 and 1 representing credibility.
-
-URL: {url}
-
-Content snippet:
-{content[:500]}
-"""
-
+    Evaluate the credibility and relevance of this source.
+    Topic: "{topic}"
+    Title: {title}
+    URL: {url}
+    Content Snippet: {content[:500]}
+    
+    CRITERIA:
+    - Official docs/gov/edu = High (0.9-1.0)
+    - Reputable blogs/news = Medium (0.7-0.9)
+    - Forums/Unknown = Low (0.1-0.4)
+    - Irrelevant to topic = 0.0
+    
+    OUTPUT:
+    Return ONLY a single number between 0.0 and 1.0.
+    """
+    
     try:
         resp = client.chat.completions.create(
             model=MODEL,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.0,
+            max_tokens=10
         )
+        resp_text = resp.choices[0].message.content.strip()
+        
+        # ✅ ROBUST PARSING (Finds number inside text)
+        match = re.search(r"0\.\d+|1\.0|0|1", resp_text)
+        if match:
+            return float(match.group())
+        
+        return 0.5 
+        
+    except Exception as e:
+        logger.error(f"[LLM] Eval failed: {e}")
+        return 0.5
 
-        output = resp.choices[0].message.content.strip()
-
-        # Convert to float safely
+# ------------------------------------------------------------------
+# 4. TITLE GENERATOR 
+# ------------------------------------------------------------------
+def generate_chat_title(first_message: str) -> str:
+    """Generates a 3-5 word title."""
+    if not first_message: return "New Chat"
+    
+    if OPENAI_API_KEY:
         try:
-            value = float(output)
-            return max(0.0, min(1.0, value))
-        except ValueError:
-            logger.warning("[LLM WARN] Non-numeric credibility output: %r", output)
-            return 0.5
-
-    except APIConnectionError as e:
-        logger.error("[LLM ERROR - evaluate_source] APIConnectionError: %r", e)
-    except RateLimitError as e:
-        logger.error("[LLM ERROR - evaluate_source] RateLimitError: %r", e)
-    except OpenAIError as e:
-        logger.error("[LLM ERROR - evaluate_source] OpenAIError: %r", e)
-    except Exception as e:
-        logger.error("[LLM ERROR - evaluate_source] Unexpected: %r", e)
-
-    return 0.5
-
-
-# ============================================================
-# GENERIC CHAT COMPLETION (KG + others)
-# ============================================================
-
-
-async def run_chat_completion(prompt: str, json_mode: bool = False) -> str:
-    """
-    Wrapper for async-style GPT calls.
-    Safe for JSON-mode (used by Knowledge Graph).
-    """
-    try:
-        if json_mode:
+            prompt = f"Generate a 3-5 word concise title. No quotes.\n\nMessage: {first_message[:200]}"
             resp = client.chat.completions.create(
                 model=MODEL,
                 messages=[{"role": "user", "content": prompt}],
-                response_format={"type": "json_object"},
-                temperature=0.0,
+                max_tokens=15
             )
-        else:
-            resp = client.chat.completions.create(
-                model=MODEL,
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.2,
-            )
-
-        return resp.choices[0].message.content.strip()
-
-    except APIConnectionError as e:
-        logger.error("[LLM ERROR - run_chat_completion] APIConnectionError: %r", e)
-    except RateLimitError as e:
-        logger.error("[LLM ERROR - run_chat_completion] RateLimitError: %r", e)
-    except OpenAIError as e:
-        logger.error("[LLM ERROR - run_chat_completion] OpenAIError: %r", e)
-    except Exception as e:
-        logger.error("[LLM ERROR - run_chat_completion] Unexpected: %r", e)
-
-    return ""
-
-
-def diff_research_runs(latest: Dict, previous: Dict) -> str:
-    """
-    Use GPT-4.1-mini to explain the difference between two auto-research runs.
-    Both dicts are rows from `auto_research_history`.
-
-    Returns a short, structured natural-language diff.
-    """
-    # Safe extraction with fallbacks
-    topic = latest.get("topic") or previous.get("topic") or "Unknown topic"
-
-    # Ensure we always have strings
-    latest_summary = (latest.get("full_summary_text") or "").strip()
-    previous_summary = (previous.get("full_summary_text") or "").strip()
-
-    # Hard length cap to avoid huge prompt
-    max_chars = 4000
-    latest_summary = latest_summary[:max_chars]
-    previous_summary = previous_summary[:max_chars]
-
-    meta_latest = {
-        "status": latest.get("status"),
-        "result_count": latest.get("result_count"),
-        "kg_nodes": latest.get("kg_nodes"),
-        "kg_edges": latest.get("kg_edges"),
-        "run_finished_at": latest.get("run_finished_at"),
-    }
-    meta_previous = {
-        "status": previous.get("status"),
-        "result_count": previous.get("result_count"),
-        "kg_nodes": previous.get("kg_nodes"),
-        "kg_edges": previous.get("kg_edges"),
-        "run_finished_at": previous.get("run_finished_at"),
-    }
-
-    meta_block = (
-        f"TOPIC: {topic}\n\n"
-        f"PREVIOUS RUN META:\n{meta_previous}\n\n"
-        f"LATEST RUN META:\n{meta_latest}\n"
-    )
-
-    prompt = f"""
-You are an assistant that compares two research runs on the same topic.
-
-You are given:
-- High-level metadata for the previous and latest runs
-- Aggregated summaries of what each run found
-
-Your job:
-1. Explain in 5–8 bullet points what CHANGED between the previous and latest run.
-2. Focus on:
-   - New insights or sources that appear in the latest run
-   - Insights that disappeared or became less prominent
-   - Changes in knowledge graph complexity (nodes/edges)
-   - Any change in reliability or confidence (if visible)
-3. Keep it neutral, factual, and concise.
-4. If there is very little difference, explicitly say that the runs are largely similar.
-
-{meta_block}
-
------ PREVIOUS RUN SUMMARY -----
-{previous_summary or "(no summary text)"}
-
------ LATEST RUN SUMMARY -----
-{latest_summary or "(no summary text)"}
-"""
-
-    try:
-        resp = client.chat.completions.create(
-            model=MODEL,
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are a precise, neutral research comparison assistant.",
-                },
-                {
-                    "role": "user",
-                    "content": prompt,
-                },
-            ],
-            max_tokens=350,
-        )
-        return resp.choices[0].message.content.strip()
-    except Exception as e:
-        # On any error, fall back to a minimal string so the API still works
-        logging.getLogger(__name__).error("[LLM DIFF] Error generating diff: %s", e)
-        return (
-            "Unable to generate semantic diff for these runs due to an internal error."
-        )
+            return resp.choices[0].message.content.strip().replace('"', '')
+        except Exception:
+            pass 
+    
+    words = first_message.strip().split()
+    return " ".join(words[:5]) + "..." if len(words) > 5 else first_message
