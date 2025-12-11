@@ -338,8 +338,21 @@ def run_research_task(topic: str, user_id: str, job_id: Optional[str] = None):
         # ----------------------------------------------------
         # 5. EMAIL NOTIFICATIONS
         # ----------------------------------------------------
+        # ----------------------------------------------------
+        # 5. EMAIL NOTIFICATIONS
+        # ----------------------------------------------------
         try:
-            user_email = "krishsaraiya999@gmail.com"
+            # Fetch user's email from Supabase Auth
+            sb = get_supabase()
+            user_resp = (
+                sb.table("users").select("email").eq("id", user_id).single().execute()
+            )
+
+            if not user_resp.data or "email" not in user_resp.data:
+                logger.error("[EMAIL] Could not find email for user_id=%s", user_id)
+                return
+
+            user_email = user_resp.data["email"]
             human_time = _format_human_time(end_ts)
 
             # FAILURE email
@@ -352,7 +365,7 @@ def run_research_task(topic: str, user_id: str, job_id: Optional[str] = None):
                 )
                 return
 
-            # -- DIFF LOGIC --
+            # DIFF LOGIC
             previous_summary = _get_last_summary(job_id)
             diff_summary = (
                 _compute_diff(previous_summary, combined_summary_text)
@@ -360,7 +373,7 @@ def run_research_task(topic: str, user_id: str, job_id: Optional[str] = None):
                 else None
             )
 
-            # FIRST RUN → Send full email
+            # FIRST RUN EMAIL
             if previous_summary is None:
                 top_insights = _extract_top_insights_from_summaries(
                     summaries_for_history, max_items=3
@@ -375,12 +388,12 @@ def run_research_task(topic: str, user_id: str, job_id: Optional[str] = None):
                 )
                 return
 
-            # NO CHANGE → skip email
+            # NO CHANGES → SKIP EMAIL
             if diff_summary is None:
                 logger.info("[EMAIL] No diff → skipping email.")
                 return
 
-            # CHANGES DETECTED → send update email
+            # SEND DIFF UPDATE EMAIL
             send_scheduler_update_email(
                 user_email=user_email,
                 topic=topic,
