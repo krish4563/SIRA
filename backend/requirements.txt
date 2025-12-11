@@ -12,3 +12,4 @@ openai>=1.50.0
 APScheduler==3.10.4
 feedparser
 reportlab
+supabase==2.4.0
