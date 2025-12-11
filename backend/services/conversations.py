@@ -3,8 +3,11 @@
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional
 
-from services.supabase_client import get_supabase
+from dateutil import parser
+
 from services.llm_client import generate_chat_title
+from services.supabase_client import get_supabase
+
 
 # ─────────────────────────────────────
 # CREATE CONVERSATION
@@ -124,7 +127,7 @@ def list_conversations_grouped(user_id: str) -> Dict[str, List[Dict[str, Any]]]:
         .select("id, topic_title, created_at, updated_at")
         .eq("user_id", user_id)
         # ✅ Order by Last Active (updated_at) not Created
-        .order("updated_at", desc=True) 
+        .order("updated_at", desc=True)
         .execute()
     )
 
@@ -145,16 +148,28 @@ def list_conversations_grouped(user_id: str) -> Dict[str, List[Dict[str, Any]]]:
     for row in rows:
         created_at = row["created_at"]
         updated_at = row.get("updated_at") or created_at
-        
+
         # ✅ Use updated_at for grouping logic
         # Normalize ISO strings
-        sort_dt = datetime.fromisoformat(updated_at.replace("Z", "+00:00"))
+        try:
+            sort_dt = parser.isoparse(updated_at)
+        except Exception:
+            # fallback: trim fractional seconds to microseconds
+            if "." in updated_at:
+                base, rest = updated_at.split(".", 1)
+                frac = rest.split("+")[0]
+                tz = "+" + rest.split("+")[1] if "+" in rest else ""
+                frac = (frac + "000000")[:6]  # normalize to 6 digits
+                fixed = f"{base}.{frac}{tz}"
+                sort_dt = datetime.fromisoformat(fixed)
+            else:
+                raise
 
         item = {
             "id": row["id"],
             "title": row["topic_title"],
             "created_at": created_at,
-            "updated_at": updated_at, # ✅ Send to frontend
+            "updated_at": updated_at,  # ✅ Send to frontend
         }
 
         if sort_dt >= today_start:
@@ -169,6 +184,7 @@ def list_conversations_grouped(user_id: str) -> Dict[str, List[Dict[str, Any]]]:
     # Remove empty groups (ChatGPT-style)
     return {k: v for k, v in grouped.items() if v}
 
+
 def generate_and_update_title(conversation_id: str, first_message_content: str):
     """
     Orchestrator: Calls LLM to get title, then updates Supabase.
@@ -178,9 +194,8 @@ def generate_and_update_title(conversation_id: str, first_message_content: str):
 
     # 2. Update Database
     supabase = get_supabase()
-    supabase.table("conversations").update({
-        "topic_title": new_title,
-        "updated_at": datetime.now(timezone.utc).isoformat()
-    }).eq("id", conversation_id).execute()
+    supabase.table("conversations").update(
+        {"topic_title": new_title, "updated_at": datetime.now(timezone.utc).isoformat()}
+    ).eq("id", conversation_id).execute()
 
     print(f"✅ Auto-titled conversation {conversation_id} to: {new_title}")
