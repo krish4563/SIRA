@@ -1,36 +1,40 @@
-# services/embeddings.py
-from sentence_transformers import SentenceTransformer
-from functools import lru_cache
+# backend/services/embeddings.py
+
 from typing import List
 
+from openai import OpenAI
 
-@lru_cache(maxsize=1)
-def get_embedder():
-    return SentenceTransformer("all-MiniLM-L6-v2")
+client = OpenAI()
 
-
-def embed_text(text: str) -> List[float]:
-    """Synchronous embedding (your original function)."""
-    model = get_embedder()
-    return model.encode([text], normalize_embeddings=True)[0].tolist()
+EMBED_MODEL = "text-embedding-3-large"
+MAX_INPUT_CHARS = 8000
 
 
 async def get_embedding(text: str) -> List[float]:
     """
-    Async wrapper for RAG pipeline.
-    (Since sentence-transformers is CPU-bound, we just call the sync version)
+    Generate a single embedding using OpenAI's embedding model.
+    Safe for Render deployment (no heavy local models).
     """
     if not text or not text.strip():
-        return [0.0] * 384
-    
-    # Truncate long text
-    text = text[:8000]
-    
-    return embed_text(text)
+        # OpenAI embedding size for this model is 3072
+        return [0.0] * 3072
+
+    # Truncate long text to avoid API issues
+    text = text[:MAX_INPUT_CHARS]
+
+    response = client.embeddings.create(model=EMBED_MODEL, input=text)
+
+    return response.data[0].embedding
 
 
 async def get_embeddings_batch(texts: List[str]) -> List[List[float]]:
-    """Generate embeddings for multiple texts."""
-    model = get_embedder()
-    embeddings = model.encode(texts, normalize_embeddings=True)
-    return embeddings.tolist()
+    """
+    Generate embeddings for multiple documents at once.
+    More efficient than calling single embeddings in a loop.
+    """
+    # Clean & truncate each input
+    cleaned = [(t[:MAX_INPUT_CHARS] if t else "") for t in texts]
+
+    response = client.embeddings.create(model=EMBED_MODEL, input=cleaned)
+
+    return [item.embedding for item in response.data]
