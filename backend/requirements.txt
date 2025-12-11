@@ -11,7 +11,7 @@ pydantic
 httpx
 duckduckgo-search
 trafilatura
-pinecone-client
+pinecone
 requests
 openai
 APScheduler
