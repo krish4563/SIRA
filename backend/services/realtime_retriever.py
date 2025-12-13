@@ -79,16 +79,18 @@ def fetch_nifty50() -> list[dict]:
     if not data:
         return []
 
-    last_price = data["c"][-1]
-
-    return [
-        {
-            "title": "Live Nifty 50 Index",
-            "url": "https://www.nseindia.com",
-            "snippet": f"Nifty50 latest price: {last_price}",
-            "provider": "moneycontrol",
-        }
-    ]
+    try:
+        last_price = data["c"][-1]
+        return [
+            {
+                "title": "Live Nifty 50 Index",
+                "url": "https://www.nseindia.com",
+                "snippet": f"Nifty50 latest price: {last_price}",
+                "provider": "moneycontrol",
+            }
+        ]
+    except (KeyError, IndexError):
+        return []
 
 
 # ------------------------------------------------------
@@ -105,16 +107,18 @@ def fetch_forex() -> list[dict]:
     if not fx:
         return []
 
-    rate = fx["rates"]["INR"]
-
-    return [
-        {
-            "title": "USD/INR Forex Rate",
-            "url": "https://api.exchangerate.host/latest",
-            "snippet": f"USD → INR: {rate}",
-            "provider": "exchangerate.host",
-        }
-    ]
+    try:
+        rate = fx["rates"]["INR"]
+        return [
+            {
+                "title": "USD/INR Forex Rate",
+                "url": "https://api.exchangerate.host/latest",
+                "snippet": f"USD → INR: {rate}",
+                "provider": "exchangerate.host",
+            }
+        ]
+    except KeyError:
+        return []
 
 
 # ------------------------------------------------------
@@ -127,16 +131,18 @@ def fetch_gold() -> list[dict]:
     if not gold:
         return []
 
-    xau = gold[0]["price"]
-
-    return [
-        {
-            "title": "Live Gold Price (XAU/USD)",
-            "url": "https://metals.live",
-            "snippet": f"Gold Spot Price (USD): {xau}",
-            "provider": "metals.live",
-        }
-    ]
+    try:
+        xau = gold[0]["price"]
+        return [
+            {
+                "title": "Live Gold Price (XAU/USD)",
+                "url": "https://metals.live",
+                "snippet": f"Gold Spot Price (USD): {xau}",
+                "provider": "metals.live",
+            }
+        ]
+    except (KeyError, IndexError):
+        return []
 
 
 # ------------------------------------------------------
@@ -148,7 +154,7 @@ OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
 
 def fetch_weather(city: str = "Pune") -> list[dict]:
     if not OPENWEATHER_API_KEY:
-        logger.warning("[REALTIME] OPENWEATHER_API_KEY missing.")
+        # logger.warning("[REALTIME] OPENWEATHER_API_KEY missing.")
         return []
 
     data = safe_get(
@@ -159,19 +165,22 @@ def fetch_weather(city: str = "Pune") -> list[dict]:
     if not data:
         return []
 
-    temp = data["main"]["temp"]
-    feels_like = data["main"]["feels_like"]
-    humidity = data["main"]["humidity"]
-    desc = data["weather"][0]["description"].title()
+    try:
+        temp = data["main"]["temp"]
+        feels_like = data["main"]["feels_like"]
+        humidity = data["main"]["humidity"]
+        desc = data["weather"][0]["description"].title()
 
-    return [
-        {
-            "title": f"Weather in {city}",
-            "url": f"https://openweathermap.org/city/{data['id']}",
-            "snippet": f"{desc}. Temp: {temp}°C, Feels like: {feels_like}°C, Humidity: {humidity}%",
-            "provider": "openweather",
-        }
-    ]
+        return [
+            {
+                "title": f"Weather in {city}",
+                "url": f"https://openweathermap.org/city/{data.get('id', '')}",
+                "snippet": f"{desc}. Temp: {temp}°C, Feels like: {feels_like}°C, Humidity: {humidity}%",
+                "provider": "openweather",
+            }
+        ]
+    except KeyError:
+        return []
 
 
 # ------------------------------------------------------
@@ -184,14 +193,17 @@ def fetch_aqi() -> list[dict]:
     if not aqi or aqi.get("status") != "ok":
         return []
 
-    return [
-        {
-            "title": "Live AQI (Pune)",
-            "url": "https://waqi.info",
-            "snippet": f"AQI: {aqi['data']['aqi']}",
-            "provider": "waqi",
-        }
-    ]
+    try:
+        return [
+            {
+                "title": "Live AQI (Pune)",
+                "url": "https://waqi.info",
+                "snippet": f"AQI: {aqi['data']['aqi']}",
+                "provider": "waqi",
+            }
+        ]
+    except KeyError:
+        return []
 
 
 # ------------------------------------------------------
@@ -208,18 +220,21 @@ def fetch_earthquakes() -> list[dict]:
         return []
 
     out = []
-    for e in eq["features"][:5]:
-        mag = e["properties"]["mag"]
-        place = e["properties"]["place"]
+    try:
+        for e in eq["features"][:5]:
+            mag = e["properties"]["mag"]
+            place = e["properties"]["place"]
 
-        out.append(
-            {
-                "title": f"Earthquake — M{mag}",
-                "url": e["properties"]["url"],
-                "snippet": f"Magnitude {mag} near {place}",
-                "provider": "USGS",
-            }
-        )
+            out.append(
+                {
+                    "title": f"Earthquake — M{mag}",
+                    "url": e["properties"]["url"],
+                    "snippet": f"Magnitude {mag} near {place}",
+                    "provider": "USGS",
+                }
+            )
+    except KeyError:
+        pass
 
     return out
 
@@ -232,7 +247,7 @@ def fetch_earthquakes() -> list[dict]:
 def fetch_trending_news() -> list[dict]:
     try:
         feed = feedparser.parse("https://news.google.com/rss?hl=en-IN&gl=IN&ceid=IN:en")
-    except:
+    except Exception:
         return []
 
     out = []
@@ -257,7 +272,7 @@ TWITTER_BEARER_TOKEN = os.getenv("TWITTER_BEARER_TOKEN")
 
 def fetch_twitter_trends() -> list[dict]:
     if not TWITTER_BEARER_TOKEN:
-        logger.warning("[REALTIME] TWITTER_BEARER_TOKEN missing.")
+        # logger.warning("[REALTIME] TWITTER_BEARER_TOKEN missing.")
         return []
 
     headers = {"Authorization": f"Bearer {TWITTER_BEARER_TOKEN}"}
@@ -272,20 +287,21 @@ def fetch_twitter_trends() -> list[dict]:
     if not data or not isinstance(data, list):
         return []
 
-    trends = data[0].get("trends", [])[:5]
-
-    out = []
-    for t in trends:
-        out.append(
-            {
-                "title": f"Twitter Trend: {t.get('name')}",
-                "url": t.get("url", ""),
-                "snippet": f"Tweet Volume: {t.get('tweet_volume')}",
-                "provider": "twitter",
-            }
-        )
-
-    return out
+    try:
+        trends = data[0].get("trends", [])[:5]
+        out = []
+        for t in trends:
+            out.append(
+                {
+                    "title": f"Twitter Trend: {t.get('name')}",
+                    "url": t.get("url", ""),
+                    "snippet": f"Tweet Volume: {t.get('tweet_volume')}",
+                    "provider": "twitter",
+                }
+            )
+        return out
+    except IndexError:
+        return []
 
 
 # ------------------------------------------------------
@@ -294,6 +310,10 @@ def fetch_twitter_trends() -> list[dict]:
 
 
 def fetch_realtime(topic: str) -> list[dict]:
+    """
+    Decides which real-time API to call based on keywords.
+    Returns [] if no keyword matches (Fix for Bitcoin-everywhere bug).
+    """
     t = topic.lower()
 
     if any(x in t for x in ["btc", "eth", "crypto", "bitcoin", "ethereum"]):
@@ -323,5 +343,7 @@ def fetch_realtime(topic: str) -> list[dict]:
     if any(x in t for x in ["twitter", "trend", "x.com", "hashtags"]):
         return fetch_twitter_trends()
 
-    # Default fallback: crypto
-    return fetch_crypto()
+    # ---------------------------------------------------
+    # 🚨 CRITICAL FIX: RETURN EMPTY LIST INSTEAD OF CRYPTO
+    # ---------------------------------------------------
+    return []

@@ -1,0 +1,12 @@
+# Ignore cache files
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore local data caches (optional, but recommended for clean starts)
+data/offline_cache.json
+data/scheduled_jobs.json
+
+# Ignore system files
+.DS_Store

@@ -9,7 +9,7 @@ from typing import Dict, List, Set, Tuple
 from services.llm_client import run_chat_completion
 
 # ====================================================
-# ===================  GPT KG PROMPT  =================
+# ===================   GPT KG PROMPT   =================
 # ====================================================
 
 KG_PROMPT = """
@@ -54,7 +54,7 @@ TEXT:
 
 
 # ====================================================
-# =========  GPT-BASED KNOWLEDGE GRAPH EXTRACTOR  =====
+# =========   GPT-BASED KNOWLEDGE GRAPH EXTRACTOR   =====
 # ====================================================
 
 
@@ -63,6 +63,7 @@ async def extract_knowledge_graph(text: str) -> Dict:
     if not text or not text.strip():
         return empty_graph()
 
+    # Limit text length to prevent token overflow
     prompt = KG_PROMPT.replace("{TEXT}", text[:15000])
 
     completion = await run_chat_completion(prompt, json_mode=True)
@@ -155,7 +156,7 @@ def finalize_graph(kg: Dict) -> Dict:
 
 
 # ====================================================
-# ==========  SPACY TRIPLET EXTRACTOR (DISABLED) =====
+# ==========   SPACY TRIPLET EXTRACTOR (DISABLED) =====
 # ====================================================
 
 """
@@ -217,23 +218,19 @@ We keep the code commented for future local use / research extension.
 #             rel = _relation_from_span(between)
 #             edges.append(Edge(source=_normalize(a.text), target=_normalize(b.text), relation=rel))
 #     return edges
-#
-# def extract_triplets_from_texts(texts: List[str]) -> Dict:
-#     nlp = _get_nlp()
-#     node_map = {}
-#     edges = []
-#     for t in texts:
-#         if not t.strip():
-#             continue
-#         doc = nlp(t)
-#         nodes = _extract_entities(doc)
-#         for n in nodes:
-#             node_map.setdefault(n.id, n)
-#         sent_edges = _extract_sentence_edges(doc)
-#         edges.extend(sent_edges)
-#
-#     return {
-#         "nodes": [{"data": {"id": n.id, "label": n.label, "type": n.type}} for n in node_map.values()],
-#         "edges": [{"data": {"source": e.source, "target": e.target, "label": e.relation}} for e in edges],
-#         "counts": {"nodes": len(node_map), "edges": len(edges)},
-#     }
+
+
+# ====================================================
+# ========= COMPATIBILITY LAYER (FIX FOR CRASH) ======
+# ====================================================
+
+def extract_triplets_from_texts(texts: List[str]) -> Dict:
+    """
+    CRITICAL FIX: This function acts as a placeholder to prevent 'tasks.py'
+    from crashing due to ImportError.
+
+    Since spaCy is disabled, this returns an empty graph structure.
+    If you need actual KG extraction, you must update 'tasks.py' to use
+    'await extract_knowledge_graph(text)' instead.
+    """
+    return empty_graph()

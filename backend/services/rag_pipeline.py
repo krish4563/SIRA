@@ -9,7 +9,7 @@ from services.memory_manager import MemoryManager
 from services.multi_retriever import search_and_extract
 from services.realtime_retriever import fetch_realtime
 
-logger = logging.getLogger(_name_)
+logger = logging.getLogger(__name__)
 
 THRESHOLD_HIGH = 0.82
 THRESHOLD_MEDIUM = 0.70
