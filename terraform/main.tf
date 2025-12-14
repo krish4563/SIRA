@@ -14,7 +14,7 @@ resource "google_cloud_run_service" "backend" {
   template {
     spec {
       containers {
-        image = "${var.region}-docker.pkg.dev/${var.project_id}/sira-repo/${var.backend_service_name}:latest"
+        image = "us-docker.pkg.dev/cloudrun/container/hello"
 
         resources {
           limits = {
@@ -27,7 +27,7 @@ resource "google_cloud_run_service" "backend" {
           container_port = 8080
         }
 
-        #env varivables 
+        # --- Environment Variables ---
         env {
           name  = "OPENAI_API_KEY"
           value = var.OPENAI_API_KEY
@@ -100,7 +100,7 @@ resource "google_cloud_run_service" "backend" {
     }
   }
 
-  # Ignore image changes so Terraform doesn't overwrite GitHub Actions deployments
+  # "Once created, DO NOT change the image back to 'hello-world' even if I run terraform apply again."
   lifecycle {
     ignore_changes = [
       template[0].spec[0].containers[0].image,
