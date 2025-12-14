@@ -2,9 +2,6 @@ name: Deploy Backend
 on:
   push:
     branches: [ "main" ]
-    paths:
-      - 'SIRA/backend/**'
-      - 'SIRA/terraform/**'
 env:
   # GCP Constants
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
