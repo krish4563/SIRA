@@ -12,9 +12,6 @@ jobs:
   deploy:
     name: Build & Deploy Backend
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ env.WORKDIR }}
     steps:
       # 1. Checkout Code
       - name: Checkout
