@@ -8,7 +8,6 @@ env:
   REGION: asia-south1
   REPO_NAME: sira-repo
   SERVICE_NAME: sira-backend
-  WORKDIR: ./SIRA
 jobs:
   deploy:
     name: Build & Deploy Backend
