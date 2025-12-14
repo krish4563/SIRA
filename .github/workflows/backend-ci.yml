@@ -1,24 +1,78 @@
-name: Backend CI
-
+name: Deploy Backend
 on:
   push:
-    branches: ["main", "master"]
-  pull_request:
-    branches: ["main", "master"]
-
+    branches: [ "main" ]
+    paths:
+      - 'SIRA/backend/**'
+      - 'SIRA/terraform/**'
+env:
+  # GCP Constants
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: asia-south1
+  REPO_NAME: sira-repo
+  SERVICE_NAME: sira-backend
+  WORKDIR: ./SIRA
 jobs:
-  build-test:
+  deploy:
+    name: Build & Deploy Backend
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        working-directory: ${{ env.WORKDIR }}
     steps:
-      - name: Checkout Code
+      # 1. Checkout Code
+      - name: Checkout
         uses: actions/checkout@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Build Docker Image
-        # We move into the backend folder before building
+      # 2. Authenticate to Google Cloud
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+      # 3. Setup Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+      # 4. Terraform Init & Apply
+      - name: Terraform Apply
         run: |
+          cd terraform
+          terraform init
+          terraform apply -auto-approve
+        env:
+          TF_VAR_project_id: ${{ secrets.GCP_PROJECT_ID }}
+          TF_VAR_OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          TF_VAR_PINECONE_API_KEY: ${{ secrets.PINECONE_API_KEY }}
+          TF_VAR_PINECONE_INDEX: ${{ secrets.PINECONE_INDEX }}
+          TF_VAR_SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
+          TF_VAR_BRAVE_KEY: ${{ secrets.BRAVE_KEY }}
+          TF_VAR_SUMMARIZER_MODEL: ${{ secrets.SUMMARIZER_MODEL }}
+          TF_VAR_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          TF_VAR_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          TF_VAR_SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          TF_VAR_SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          TF_VAR_SMTP_USER: ${{ secrets.SMTP_USER }}
+          TF_VAR_SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          TF_VAR_SMTP_FROM_EMAIL: ${{ secrets.SMTP_FROM_EMAIL }}
+          TF_VAR_SMTP_FROM_NAME: ${{ secrets.SMTP_FROM_NAME }}
+          TF_VAR_TWITTER_BEARER_TOKEN: ${{ secrets.TWITTER_BEARER_TOKEN }}
+          TF_VAR_OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+
+      # 5. Configure Docker for Artifact Registry
+      - name: Docker Auth
+        run: |-
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+
+      # 6. Build and Push Docker Image
+      - name: Build and Push Container
+        run: |-
           cd backend
-          docker build -t sira-backend:test .
+          docker build -t "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}" .
+          docker push "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}"
+
+      # 7. Deploy to Cloud Run
+      - name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v1
+        with:
+          service: ${{ env.SERVICE_NAME }}
+          region: ${{ env.REGION }}
+          image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.SERVICE_NAME }}:${{ github.sha }}

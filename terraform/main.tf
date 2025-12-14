@@ -1,6 +1,4 @@
-# ---------------------------------------------------
-# 1. Artifact Registry (Storage for Docker Images)
-# ---------------------------------------------------
+# 1. Artifact Registry Repository
 resource "google_artifact_registry_repository" "sira_repo" {
   location      = var.region
   repository_id = "sira-repo"
@@ -8,9 +6,7 @@ resource "google_artifact_registry_repository" "sira_repo" {
   format        = "DOCKER"
 }
 
-# ---------------------------------------------------
 # 2. Cloud Run Service (The Backend Server)
-# ---------------------------------------------------
 resource "google_cloud_run_service" "backend" {
   name     = var.backend_service_name
   location = var.region
@@ -18,21 +14,98 @@ resource "google_cloud_run_service" "backend" {
   template {
     spec {
       containers {
-        # This points to the image we will upload later
         image = "${var.region}-docker.pkg.dev/${var.project_id}/sira-repo/${var.backend_service_name}:latest"
-        
+
         resources {
           limits = {
-            memory = "512Mi"
+            memory = "1Gi"
             cpu    = "1"
           }
         }
-        
+
         ports {
           container_port = 8080
         }
+
+        #env varivables 
+        env {
+          name  = "OPENAI_API_KEY"
+          value = var.OPENAI_API_KEY
+        }
+        # env {
+        #   name  = "FRONTEND_ORIGIN"
+        #   value = var.FRONTEND_ORIGIN
+        # }
+        env {
+          name  = "PINECONE_API_KEY"
+          value = var.PINECONE_API_KEY
+        }
+        env {
+          name  = "PINECONE_INDEX"
+          value = var.PINECONE_INDEX
+        }
+        env {
+          name  = "SERPAPI_KEY"
+          value = var.SERPAPI_KEY
+        }
+        env {
+          name  = "BRAVE_KEY"
+          value = var.BRAVE_KEY
+        }
+        env {
+          name  = "SUMMARIZER_MODEL"
+          value = var.SUMMARIZER_MODEL
+        }
+        env {
+          name  = "SUPABASE_URL"
+          value = var.SUPABASE_URL
+        }
+        env {
+          name  = "SUPABASE_SERVICE_ROLE_KEY"
+          value = var.SUPABASE_SERVICE_ROLE_KEY
+        }
+        env {
+          name  = "SMTP_HOST"
+          value = var.SMTP_HOST
+        }
+        env {
+          name  = "SMTP_PORT"
+          value = var.SMTP_PORT
+        }
+        env {
+          name  = "SMTP_USER"
+          value = var.SMTP_USER
+        }
+        env {
+          name  = "SMTP_PASSWORD"
+          value = var.SMTP_PASSWORD
+        }
+        env {
+          name  = "SMTP_FROM_EMAIL"
+          value = var.SMTP_FROM_EMAIL
+        }
+        env {
+          name  = "SMTP_FROM_NAME"
+          value = var.SMTP_FROM_NAME
+        }
+        env {
+          name  = "TWITTER_BEARER_TOKEN"
+          value = var.TWITTER_BEARER_TOKEN
+        }
+        env {
+          name  = "OPENWEATHER_API_KEY"
+          value = var.OPENWEATHER_API_KEY
+        }
       }
     }
+  }
+
+  # Ignore image changes so Terraform doesn't overwrite GitHub Actions deployments
+  lifecycle {
+    ignore_changes = [
+      template[0].spec[0].containers[0].image,
+      traffic
+    ]
   }
 
   traffic {
@@ -41,9 +114,7 @@ resource "google_cloud_run_service" "backend" {
   }
 }
 
-# ---------------------------------------------------
-# 3. Public Access (Make Backend accessible to Frontend)
-# ---------------------------------------------------
+# 3. Public Access
 data "google_iam_policy" "noauth" {
   binding {
     role = "roles/run.invoker"
