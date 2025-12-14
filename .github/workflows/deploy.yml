@@ -33,6 +33,7 @@ jobs:
           terraform apply -auto-approve
         env:
           TF_VAR_project_id: ${{ secrets.GCP_PROJECT_ID }}
+          TF_VAR_FRONTEND_ORIGIN: ${{ secrets.FRONTEND_ORIGIN }}
           TF_VAR_OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           TF_VAR_PINECONE_API_KEY: ${{ secrets.PINECONE_API_KEY }}
           TF_VAR_PINECONE_INDEX: ${{ secrets.PINECONE_INDEX }}

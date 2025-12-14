@@ -10,7 +10,7 @@ load_dotenv()
 @dataclass
 class Settings:
     # Frontend
-    # frontend_origin: str = os.getenv("FRONTEND_ORIGIN", "http://localhost:3000")
+    frontend_origin: str = os.getenv("FRONTEND_ORIGIN", "http://localhost:3000")
 
     # Pinecone
     pinecone_api_key: str = os.getenv("PINECONE_API_KEY", "")

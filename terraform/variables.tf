@@ -17,7 +17,7 @@ variable "backend_service_name" {
 }
 
 variable "OPENAI_API_KEY" {type = string}
-# variable "FRONTEND_ORIGIN" {type = string}
+variable "FRONTEND_ORIGIN" {type = string}
 variable "PINECONE_API_KEY" {type = string}
 variable "PINECONE_INDEX" {type = string}
 variable "SERPAPI_KEY" {type = string}

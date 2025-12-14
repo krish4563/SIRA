@@ -32,10 +32,10 @@ resource "google_cloud_run_service" "backend" {
           name  = "OPENAI_API_KEY"
           value = var.OPENAI_API_KEY
         }
-        # env {
-        #   name  = "FRONTEND_ORIGIN"
-        #   value = var.FRONTEND_ORIGIN
-        # }
+        env {
+          name  = "FRONTEND_ORIGIN"
+          value = var.FRONTEND_ORIGIN
+        }
         env {
           name  = "PINECONE_API_KEY"
           value = var.PINECONE_API_KEY
