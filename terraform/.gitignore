@@ -1,0 +1,19 @@
+# Local .terraform directories (Plugins & Modules)
+**/.terraform/*
+
+# .tfstate files (Contains sensitive info about your current infrastructure)
+*.tfstate
+*.tfstate.*
+
+# Crash log files (If Terraform crashes)
+crash.log
+
+# Ignore variables file if it contains passwords
+# (We don't have passwords in ours yet, but keep this here for safety)
+terraform.tfvars
+terraform.tfvars.json
+
+# Ignore override files
+override.tf
+override.tf.json
+*_
